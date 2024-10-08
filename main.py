@@ -1,17 +1,15 @@
-import sys
-from UI_desktop import QML
+import slots
 from slots import *
-import vlc
 
 def main():
-    # TODO
-    # App
+# TODO
+#
+# App
     app = QGuiApplication(sys.argv)
-
 
     # Run the main Qt loop
     engine = QQmlApplicationEngine()
-    engine.loadData(QML.encode('utf-8'))
+    engine.load( QUrl("UI_desktop.qml") );
     if not engine.rootObjects():
         sys.exit(-1)
     exit_code = app.exec()
