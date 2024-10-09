@@ -1,0 +1,26 @@
+CREATE TABLE songs 
+(
+    song_id INTEGER PRIMARY_KEY, 
+    song_name TEXT NOT NULL,
+    track_len INTEGER NOT NULL, 
+    artist TEXT NOT NULL,
+    album TEXT NOT NULL
+);
+
+CREATE TABLE tags
+(
+    tag_id INT PRIMARY_KEY NOT NULL,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE tagToSong
+(
+    relation_id INT PRIMARY_KEY NOT NULL
+    tag INT NOT NULL,
+    FOREIGN KEY(tag) REFERENCES tags(tag_id),
+    song INT NOT NULL,
+    FOREIGN KEY(song) REFERENCES songs(song_id)
+);
+
+INSERT INTO songs (song_name, track_len, artist, album) 
+            VALUES ("bombtrack", 500, "rage", "rage");

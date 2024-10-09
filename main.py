@@ -9,7 +9,7 @@ def main():
 
     # Run the main Qt loop
     engine = QQmlApplicationEngine()
-    engine.load( QUrl("qml/UI_desktop.qml") );
+    engine.load( QUrl("qml/UI_desktop.qml") )
     if not engine.rootObjects():
         sys.exit(-1)
     exit_code = app.exec()
