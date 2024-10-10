@@ -28,8 +28,9 @@ Window {
         AbstractButton{
             id: play_button
             Layout.alignment: Qt.AlignHCenter
-            icon.name: "media-playback-start-symbolic.svg"
-            icon.source: "/icons/icons8-play-100.png"
+            icon.name: "icons8-play-100.png"
+            icon.source: "qrc:/icons/icons8-play-100.png"
+            text: "play"
             onClicked: media_controller.toggle_play_pause()
         }
 

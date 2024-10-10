@@ -1,0 +1,11 @@
+{
+    "files": [
+        "main.py",
+        "db.py",
+        "slots.py",
+        "songs.db",
+        "schema.txt",
+        "resources.qrc",
+        "qml/UI_desktop.qml"
+    ]
+}
