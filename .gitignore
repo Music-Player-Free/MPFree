@@ -130,6 +130,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# # SQLite stuff
+# schema.txt
+
 # Spyder project settings
 .spyderproject
 .spyproject
