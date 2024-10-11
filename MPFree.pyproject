@@ -5,7 +5,7 @@
         "slots.py",
         "songs.db",
         "schema.txt",
-        "resources.qrc",
-        "qml/UI_desktop.qml"
+        "MainWindow.py",
+        "Collections.py"
     ]
 }

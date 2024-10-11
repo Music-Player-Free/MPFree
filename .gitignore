@@ -140,15 +140,6 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# Qt Creator stuff
-# Not using Qt Creator for development, just for debugging icons.
-# Have additional Qt Creator project files locally.
-my/
-.qtcreator/
-rc_resources.py
-MPFree.pyproject.user
-
-
 # mkdocs documentation
 /site
 
