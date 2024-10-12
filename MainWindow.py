@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
         self.label = QLabel("MPFree Music Player")
         layout = QHBoxLayout()
 
-        loaded_collections = [Collection("thumbnail","name","artist"), Collection("thumbnail","name","artist")] #TODO: replace with a list, loaded from database
+        loaded_collections = [Collection("thumbnail","My Playlist","artist"), Collection("thumbnail","Cool Album","artist")] #TODO: replace with a list, loaded from database
         collections = Collections()
         collections.populate(loaded_collections)
 
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-        layout.addWidget(collections)
         self.setLayout(layout)
+        layout.addWidget(collections)
         #layout.addWidget(songs)
         #layout.addWidget(keybinds)

@@ -11,7 +11,7 @@ class Collection(QListWidgetItem): # For playlists, albums
 # Inherits QListWidget, which uses own implementation of QListItem
 # So each list is object (JSON-ish?)
 class Collections(QListWidget): # Displays collections
-    def __init__(self, collectionList):
+    def __init__(self):
         super().__init__()
         self.setSpacing(5)
         self.setWrapping(True)
@@ -19,18 +19,13 @@ class Collections(QListWidget): # Displays collections
         self.setVisible(True)
 
         # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QListWidget.html
-        # Putting this here
-        # I THINK (!) that the collections class (this one) should enumerate through a given
-        # list of items we want creating, and then increment row also. enumerate() is perf for this.
-        #  so, something like:
-        '''
-        for row, item enumerate(input):
-            self.insertItem(row, item)
-        '''
-        newItem = QListWidgetItem()
-        newItem.setText("testing of course")
-        row = 0 # I think it is in 0-indexed format
-        self.insertItem(row, newItem)
 
-        for n in collectionList:
-            self.addItem(n)
+    def populate(self, collectionList):# TODO: how to pass a list of Collection?
+        for row, item in enumerate(collectionList):
+            item.setText(item.name)
+            self.insertItem(row, item)
+
+        #newItem = Collection("thumbnail","name","artist")
+        #newItem.setText("testing of course")
+        #row = 0 # I think it is in 0-indexed format
+        #self.insertItem(row, newItem)
