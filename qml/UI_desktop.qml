@@ -3,9 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import my.slots.name 1.0
 
+// Main window sprawl
 Window {
-    width: Screen.desktopAvailableWidth
-    height: Screen.desktopAvailableHeight
+    width: Screen.desktopAvailableWidth   // Returns int width
+    height: Screen.desktopAvailableHeight // Returns int height
     visible: true
     title: "Hello World"
 
