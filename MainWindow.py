@@ -5,7 +5,7 @@ from Collections import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        super().__init__()
         self.label = QLabel("MPFree Music Player")
         layout = QHBoxLayout()
 
@@ -18,5 +18,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         layout.addWidget(collections)
+        self.setLayout(layout)
         #layout.addWidget(songs)
         #layout.addWidget(keybinds)
