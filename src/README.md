@@ -1,6 +1,31 @@
 # Developer documentation
 Following is the UML and design documentation for the development of MPFree. If you wish to contribute, please start here
 
+# Data Model
+
+```mermaid
+---
+title: Data Model
+---
+classDiagram
+
+  Songs <|-- Song
+
+  class Song{
+      +int ID
+      +String path_to_file
+      +String title
+      +String artist
+      +int duration
+  }
+  
+  note for Songs "Screen window area\nDisplays a list of class Song
+  Class Songs{
+    +populate()
+  }
+
+```
+
 # Database documentation
 ```mermaid
 
