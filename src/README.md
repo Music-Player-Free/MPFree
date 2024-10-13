@@ -10,7 +10,7 @@ title: Data Model
 classDiagram
 
   Songs <|-- Song
-  note for Songs "Screen window area\nDisplays a list of class Song
+  note for Songs "Screen window area\nDisplays a list of class Song"
 
   class Song{
       +int ID
