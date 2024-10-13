@@ -13,6 +13,7 @@ classDiagram
   Collections <|-- Collection
   Song <|-- Tag
   Collection <|-- Tag
+  Keybinds <|-- Keybind
   note for Songs "Screen window area\nDisplays a list of class Song"
   note for Collections "Screen window area\nDisplays a list of class Collection"
 
@@ -49,6 +50,31 @@ classDiagram
     +setName()
     +getColour()
     +setColour()
+  }
+  class Keybind{
+    +char key
+    +String action
+    +toJSON()
+    +fromJSON()
+  }
+  class Keybind{
+    +populate()
+  }
+  class MediaControls{
+    +togglePlay()
+    +skip()
+    +previous()
+  }
+  class Settings{
+    
+  }
+  class PlaybackSettings{
+    +float playSpeed
+    +float pitchModifier
+    +getPlaySpeed()
+    +setPlaySpeed()
+    +getPitchModifier()
+    +setPitchModifier()
   }
 
 ```
