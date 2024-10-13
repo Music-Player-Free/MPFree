@@ -132,6 +132,7 @@ venv.bak/
 
 # # SQLite stuff
 # schema.txt
+.DS_Store
 
 # Spyder project settings
 .spyderproject

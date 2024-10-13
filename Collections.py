@@ -1,11 +1,9 @@
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QLabel, QListView, QWidget
 
 class Collection(QListWidgetItem): # For playlists, albums
-    def __init__(self, thumbnail, name, artist):
+    def __init__(self, name):
         super().__init__()
-        self.thumbnail = thumbnail
         self.name = name
-        self.artist = artist
 
 
 # Inherits QListWidget, which uses own implementation of QListItem
