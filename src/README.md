@@ -10,18 +10,45 @@ title: Data Model
 classDiagram
 
   Songs <|-- Song
+  Collections <|-- Collection
+  Song <|-- Tag
+  Collection <|-- Tag
   note for Songs "Screen window area\nDisplays a list of class Song"
+  note for Collections "Screen window area\nDisplays a list of class Collection"
 
   class Song{
-      +int ID
-      +String path_to_file
-      +String title
-      +String artist
-      +int duration
+    +int ID
+    +String path_to_file
+    +String title
+    +String artist
+    +int duration
+    +getPathToFile()
+    +getTitle()
+    +setTitle()
+    +getArtist()
+    +setArtist()
+    +getDuration()
   }
-  
   class Songs{
     +populate()
+  }
+  class Collection{
+    +int ID
+    +String name
+    +getName()
+    +setName()
+  }
+  class Collections{
+    +populate()
+  }
+  class Tag{
+    +int ID
+    +String name
+    +enum colour
+    +getName()
+    +setName()
+    +getColour()
+    +setColour()
   }
 
 ```
