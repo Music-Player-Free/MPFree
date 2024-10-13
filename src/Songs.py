@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem
 
 class Song(QListWidgetItem):
-    def __init__(self, path_to_file, title, artist): #TODO add duration, tags[], collectionsIn[].. ,maybe other key fields
+    def __init__(self, id, path_to_file, title, artist, duration):
         super().__init__()
+        self.id = id
         self.path_to_file = path_to_file
         self.title = title
         self.artist = artist
+        self.duration = duration
 
 class Songs(QListWidget):
     def __init__(self):
