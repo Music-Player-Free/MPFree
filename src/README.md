@@ -64,6 +64,7 @@ classDiagram
     +populate()
   }
   class MediaControls{
+    +int currentSongID
     +togglePlay()
     +skip()
     +previous()
