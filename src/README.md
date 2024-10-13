@@ -60,7 +60,7 @@ classDiagram
     +toJSON()
     +fromJSON()
   }
-  class Keybind{
+  class Keybinds{
     +populate()
   }
   class MediaControls{
