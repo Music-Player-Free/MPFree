@@ -20,7 +20,7 @@ classDiagram
   }
   
   note for Songs "Screen window area\nDisplays a list of class Song
-  Class Songs{
+  class Songs{
     +populate()
   }
 
