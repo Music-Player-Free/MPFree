@@ -1,6 +1,7 @@
 CREATE TABLE songs 
 (
-    song_id INTEGER PRIMARY_KEY, 
+    id INTEGER PRIMARY KEY, 
+
     song_name TEXT NOT NULL,
     track_len INTEGER NOT NULL, 
     artist TEXT NOT NULL,
@@ -9,18 +10,60 @@ CREATE TABLE songs
 
 CREATE TABLE tags
 (
-    tag_id INT PRIMARY_KEY NOT NULL,
-    name TEXT NOT NULL
+    id INT PRIMARY_KEY NOT NULL,
+
+    name TEXT NOT NULL,
+    colour TEXT NOT NULL
 );
 
-CREATE TABLE tagToSong
+
+
+
+CREATE TABLE collections 
 (
-    relation_id INT PRIMARY_KEY NOT NULL
-    tag INT NOT NULL,
-    FOREIGN KEY(tag) REFERENCES tags(tag_id),
-    song INT NOT NULL,
-    FOREIGN KEY(song) REFERENCES songs(song_id)
+    id INT PRIMARY KEY NOT NULL,
+    #TODO
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    author
 );
 
-INSERT INTO songs (song_name, track_len, artist, album) 
-            VALUES ("bombtrack", 500, "rage", "rage");
+
+
+CREATE TABLE songs_tags
+(
+    idx INT PRIMARY KEY NOT NULL,
+
+    songs_id INT NOT NULL,
+    tags_id INT NOT NULL,
+
+    FOREIGN KEY(songs_id) REFERENCES songs(id)
+    FOREIGN KEY(tags_id) REFERENCES tags(id),
+);
+
+
+
+CREATE TABLE songs_collections 
+(
+    idx INT PRIMARY KEY NOT NULL,
+    
+    songs_id INT NOT NULL,
+    collections_id INT NOT NULL,
+
+    FOREIGN KEY(songs_id) REFERENCES songs(id),
+    FOREIGN KEY(collections_id) REFERENCES songs(id)
+
+);
+
+
+
+CREATE TABLE collections_tags
+(
+    idx INT PRIMARY KEY NOT NULL,
+    
+    collections_id INT NOT NULL,
+    tags_id INT NOT NULL,
+
+    FOREIGN KEY(collections_id) REFERENCES collections(id),
+    FOREIGN KEY(tags_id) REFERENCES tags(id)
+);
