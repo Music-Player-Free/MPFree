@@ -10,6 +10,7 @@ title: Data Model
 classDiagram
 
   Songs <|-- Song
+  note for Songs "Screen window area\nDisplays a list of class Song
 
   class Song{
       +int ID
@@ -19,9 +20,7 @@ classDiagram
       +int duration
   }
   
-  note for Songs "Screen window area\nDisplays a list of class Song
   class Songs{
-    +String test
     +populate()
   }
 
