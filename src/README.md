@@ -21,6 +21,7 @@ classDiagram
   
   note for Songs "Screen window area\nDisplays a list of class Song
   class Songs{
+    +String test
     +populate()
   }
 
