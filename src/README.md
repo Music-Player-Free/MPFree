@@ -16,6 +16,7 @@ classDiagram
   Keybinds <|-- Keybind
   note for Songs "Screen window area\nDisplays a list of class Song"
   note for Collections "Screen window area\nDisplays a list of class Collection"
+  note for Keybinds "Screen window area\nDisplays a list of class Keybind"
 
   class Song{
     +int ID
