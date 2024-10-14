@@ -1,11 +1,9 @@
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QLabel, QListView, QWidget
 
 class Collection(QListWidgetItem): # For playlists, albums
-    def __init__(self, thumbnail, name, artist):
+    def __init__(self, name):
         super().__init__()
-        self.thumbnail = thumbnail
         self.name = name
-        self.artist = artist
 
 
 # Inherits QListWidget, which uses own implementation of QListItem
@@ -20,7 +18,7 @@ class Collections(QListWidget): # Displays collections
 
         # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QListWidget.html
 
-    def populate(self, collectionList: list['Collection']):# TODO: how to pass a list of Collection?
+    def populate(self, collectionList: list['Collection']):
         for row, item in enumerate(collectionList):
             item.setText(item.name)
             self.insertItem(row, item)
