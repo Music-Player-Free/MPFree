@@ -1,13 +1,11 @@
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QLabel, QListView, QWidget
 
 class Collection(QListWidgetItem): # For playlists, albums
-    def __init__(self, name):
+    def __init__(self, db_id:int, name: str):
         super().__init__()
         self.name = name
 
 
-# Inherits QListWidget, which uses own implementation of QListItem
-# So each list is object (JSON-ish?)
 class Collections(QListWidget): # Displays collections
     def __init__(self):
         super().__init__()
@@ -16,6 +14,7 @@ class Collections(QListWidget): # Displays collections
         self.label = QLabel("Collections")
         self.setVisible(True)
 
+        self.populate(self.loadCollections())
         # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QListWidget.html
 
     def populate(self, collectionList: list['Collection']):
@@ -23,7 +22,7 @@ class Collections(QListWidget): # Displays collections
             item.setText(item.name)
             self.insertItem(row, item)
 
-        #newItem = Collection("thumbnail","name","artist")
-        #newItem.setText("testing of course")
-        #row = 0 # I think it is in 0-indexed format
-        #self.insertItem(row, newItem)
+    def loadCollections(self) -> list['Collection']:
+        #TODO: replace with loading from BD
+        loaded_collections = [Collection(0,"My Playlist"), Collection(1,"Cool Album")]
+        return loaded_collections
