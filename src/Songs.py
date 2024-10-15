@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 
 class Song(QListWidgetItem):
     '''
@@ -42,3 +42,17 @@ class Songs(QListWidget):
         #TODO: replace with loading from DB
         loaded_songs = [Song(0, "/folder/song1.mp3", "song 1", "sample", 300), Song(1, "/folder/song2.mp3", "Never Gonna Give You Up", "Rick Astley", 302)]
         return loaded_songs
+
+
+class SongsPane(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        songs = Songs()
+        label = QLabel()
+        label.setText("Songs")
+
+        layout.addWidget(label)
+        layout.addWidget(songs)

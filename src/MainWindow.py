@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QApplication, QDockWidget, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel
 
 from Collections import *
+from Keybinds import KeybindsPane
 from Songs import *
 from BottomBar import *
 
@@ -8,36 +9,27 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel("MPFree Music Player")
-        layout = QHBoxLayout()
-
-        collections = Collections()
-
-
-        songs = Songs()
-
-
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
-
-        #self.setLayout(layout)
-        layout.addWidget(collections)
-        layout.addWidget(songs)
-        #layout.addWidget(keybinds)
+        self.setMainPage()
 
     def setMainPage(self):
         central_widget = QWidget()
-
         layout = QVBoxLayout()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+
         panes = QWidget()
         panes_layout = QHBoxLayout()
         panes.setLayout(panes_layout)
 
         #create panes
-        collections = Collections()
+        collections = CollectionsPane()
         panes_layout.addWidget(collections)
-        songs = Songs()
+
+        songs = SongsPane()
         panes_layout.addWidget(songs)
+
+        keybinds = KeybindsPane()
+        panes_layout.addWidget(keybinds)
 
         #create bottom bar
         bottom_bar = BottomBar()

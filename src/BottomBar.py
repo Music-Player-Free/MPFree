@@ -13,6 +13,12 @@ class BottomBar(QWidget):
         media_controls = MediaControls()
         layout.addWidget(media_controls)
 
+        settings_button = SettingsButton()
+        layout.addWidget(settings_button)
+
+
+
+
 class NowPlaying(QWidget):
 
     def __init__(self):#TODO: Should take string as args for label texts
@@ -28,7 +34,6 @@ class NowPlaying(QWidget):
         artist.setText("Artist")
         layout.addWidget(artist)
 
-
 class MediaControls(QWidget):
     def  __init__(self):
         super().__init__()
@@ -36,10 +41,6 @@ class MediaControls(QWidget):
         self.setLayout(layout)
 
         shuffle_button = QPushButton()#TODO: Connect buttons up to slots/methods
-        shuffle_button.setText("Shuffle")
-        layout.addWidget(shuffle_button)
-
-        shuffle_button = QPushButton()
         shuffle_button.setText("Shuffle")
         layout.addWidget(shuffle_button)
 
@@ -71,3 +72,28 @@ class MediaControls(QWidget):
         print("previous song loaded")
         #else:
             #print("song restarted") // set time to 0
+
+
+class PlaybackControls(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        button = QPushButton()
+        button.setText("Playback\nControls")
+
+        layout.addWidget(button)
+
+class SettingsButton(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        button = QPushButton()
+        button.setText("Settings")
+
+        playback_button =  PlaybackControls()
+        layout.addWidget(playback_button)
+        layout.addWidget(button)

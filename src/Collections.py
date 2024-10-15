@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QLabel, QListView, QWidget
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QStyleOptionTab, QVBoxLayout, QLabel, QListView, QWidget
 
 class Collection(QListWidgetItem): # For playlists, albums
     def __init__(self, db_id:int, name: str):
@@ -26,3 +26,16 @@ class Collections(QListWidget): # Displays collections
         #TODO: replace with loading from BD
         loaded_collections = [Collection(0,"My Playlist"), Collection(1,"Cool Album")]
         return loaded_collections
+
+class CollectionsPane(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        collections = Collections()
+        label = QLabel()
+        label.setText("Collections")
+
+        layout.addWidget(label)
+        layout.addWidget(collections)
