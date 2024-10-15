@@ -13,8 +13,8 @@ class MainWindow(QMainWindow):
         collections = Collections()
         collections.populate(loaded_collections)
 
-        loaded_songs = [Song("/folder/song1.mp3","Darude Sandstorm", "Weezer"), Song("/folder/song2.mp3", "Never Gonna Give You Up", "Rick Astley")]
         songs = Songs()
+        loaded_songs = [Song(0, "/folder/song1.mp3", "song 1", "sample", 300), Song(1, "/folder/song2.mp3", "Never Gonna Give You Up", "Rick Astley", 302)]
         songs.populate(loaded_songs)
 
         widget = QWidget()
@@ -25,3 +25,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(collections)
         layout.addWidget(songs)
         #layout.addWidget(keybinds)
+
+class Not_ify(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
