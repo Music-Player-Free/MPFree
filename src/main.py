@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
-from MainWindow import MainWindow
+from MainWindow import MainWindow, Not_ify
 
 def main():
 # TODO
@@ -9,7 +9,8 @@ def main():
     app = QApplication(sys.argv)
 
     # Run the main Qt loop
-    window = MainWindow()
+    # window = MainWindow()
+    window = Not_ify()
     window.show()
     sys.exit(app.exec())
 
