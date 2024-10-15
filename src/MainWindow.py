@@ -1,32 +1,45 @@
 from PySide6.QtWidgets import QApplication, QDockWidget, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel
 
 from Collections import *
+from Keybinds import KeybindsPane
 from Songs import *
+from BottomBar import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.label = QLabel("MPFree Music Player")
-        layout = QHBoxLayout()
+        self.setMainPage()
 
-        loaded_collections = [Collection("My Playlist"), Collection("Cool Album")] #TODO: replace with a list, loaded from database
-        collections = Collections()
-        collections.populate(loaded_collections)
+    def setMainPage(self):
+        central_widget = QWidget()
+        layout = QVBoxLayout()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-        songs = Songs()
-        loaded_songs = [Song(0, "/folder/song1.mp3", "song 1", "sample", 300), Song(1, "/folder/song2.mp3", "Never Gonna Give You Up", "Rick Astley", 302)]
-        songs.populate(loaded_songs)
+        panes = QWidget()
+        panes_layout = QHBoxLayout()
+        panes.setLayout(panes_layout)
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+        #create panes
+        collections = CollectionsPane()
+        panes_layout.addWidget(collections)
 
-        self.setLayout(layout)
-        layout.addWidget(collections)
-        layout.addWidget(songs)
-        #layout.addWidget(keybinds)
+        songs = SongsPane()
+        panes_layout.addWidget(songs)
+
+        keybinds = KeybindsPane()
+        panes_layout.addWidget(keybinds)
+
+        #create bottom bar
+        bottom_bar = BottomBar()
+
+        #add widgets to QVBoxLayout
+        layout.addWidget(panes)
+        layout.addWidget(bottom_bar)
+
+
 
 class Not_ify(QMainWindow):
     def __init__(self):
         super().__init__()
-
