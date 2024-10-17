@@ -1,8 +1,10 @@
 from PySide6.QtCore import SLOT
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QPushButton
 
+from ToggleWidget import ToggleWidget
+
 class BottomBar(QWidget):
-    def __init__(self):
+    def __init__(self, ref: ToggleWidget):
         super().__init__()
         layout = QHBoxLayout()
         self.setLayout(layout)
@@ -13,7 +15,7 @@ class BottomBar(QWidget):
         media_controls = MediaControls()
         layout.addWidget(media_controls)
 
-        settings_button = SettingsButton()
+        settings_button = SettingsButton(ref)
         layout.addWidget(settings_button)
 
 
@@ -86,14 +88,19 @@ class PlaybackControls(QWidget):
         layout.addWidget(button)
 
 class SettingsButton(QWidget):
-    def __init__(self):
+    def __init__(self, ref: ToggleWidget):
         super().__init__()
         layout = QHBoxLayout()
         self.setLayout(layout)
+        self.ref = ref
 
         button = QPushButton()
         button.setText("Settings")
+        button.clicked.connect(self.clickable)
 
         playback_button =  PlaybackControls()
         layout.addWidget(playback_button)
         layout.addWidget(button)
+
+    def clickable(self):
+        self.ref.toggle()
