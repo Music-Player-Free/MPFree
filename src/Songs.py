@@ -34,6 +34,7 @@ class Songs(QListWidget):
         '''
         Set text for songs (base class ItemWidgets) and insert into self.
         '''
+        self.clear()
         for row, item in enumerate(songList):
             item.setText(item.title)
             self.insertItem(row, item)

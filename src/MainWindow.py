@@ -7,7 +7,7 @@ from Collections import *
 from Keybinds import KeybindsPane
 from Songs import *
 from BottomBar import *
-from settings import Settings
+from Settings import Settings
 
 class MainWindow(QMainWindow):
     def __init__(self):

@@ -96,11 +96,8 @@ class SettingsButton(QWidget):
 
         button = QPushButton()
         button.setText("Settings")
-        button.clicked.connect(self.clickable)
+        button.clicked.connect(self.ref.toggle())
 
         playback_button =  PlaybackControls()
         layout.addWidget(playback_button)
         layout.addWidget(button)
-
-    def clickable(self):
-        self.ref.toggle()
