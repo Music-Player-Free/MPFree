@@ -9,13 +9,13 @@ title: Data Model
 ---
 classDiagram
 
-  Songs <|-- Song
-  Collections <|-- Collection
-  Song <|-- Tag
-  Collection <|-- Tag
-  Keybinds <|-- Keybind
-  SongQueue <|-- SongQueueItem
-  SongQueueItem <|-- Song
+  Song --> Songs
+  Collection --> Collections
+  Song -- Tag
+  Collection -- Tag
+  Keybinds -- Keybind
+  SongQueue -- SongQueueItem
+  SongQueueItem -- Song
   note for Songs "Screen window area\nDisplays a list of class Song"
   note for Collections "Screen window area\nDisplays a list of class Collection"
   note for Keybinds "Screen window area\nDisplays a list of class Keybind"
@@ -103,12 +103,12 @@ classDiagram
 
   note "Methods are done via API"
 
-  CollectionSongRelation <|-- Song
-  CollectionSongRelation <|-- Collection
-  TagSongRelation <|-- Tag
-  TagSongRelation <|-- Song
-  TagCollectionRelation <|-- Tag
-  TagCollectionRelation <|-- Collection
+  CollectionSongRelation -- Song
+  CollectionSongRelation -- Collection
+  TagSongRelation -- Tag
+  TagSongRelation -- Song
+  TagCollectionRelation -- Tag
+  TagCollectionRelation -- Collection
 
   
   class Song{
@@ -159,5 +159,29 @@ classDiagram
     +deleteTagCollRel()
     +getTagCollRel()
   }
+
+```
+# Database class
+```mermaid
+
+---
+title: Querying inside Python
+---
+classDiagram
+
+  Database <|-- SongCRUD
+  
+  class Database{
+    +SQLiteConnnection con
+    +SQLiteCursor cur
+    +create()
+    +__enter__()
+    +__exit__()
+  }
+
+  class SongCRUD{
+    +insert()
+  }
+  
 
 ```
