@@ -96,7 +96,7 @@ class SettingsButton(QWidget):
 
         button = QPushButton()
         button.setText("Settings")
-        button.clicked.connect(self.clickable())
+        button.clicked.connect(self.clickable)
 
         playback_button =  PlaybackControls()
         layout.addWidget(playback_button)
