@@ -18,6 +18,7 @@ class Collections(QListWidget): # Displays collections
         # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QListWidget.html
 
     def populate(self, collectionList: list['Collection']):
+        self.clear()
         for row, item in enumerate(collectionList):
             item.setText(item.name)
             self.insertItem(row, item)
