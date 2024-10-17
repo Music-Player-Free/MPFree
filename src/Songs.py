@@ -23,21 +23,27 @@ class Songs(QListWidget):
     def __init__(self):
         super().__init__()
 
+        # Songs object extends list widget, and given spacing and wrapping properties
         self.setSpacing(5)
         self.setWrapping(True)
+
         self.label = QLabel("Songs")
         self.setVisible(True)
 
+        # Populate songs
         self.populate(self.loadSongs())
 
     def populate(self, songList: list['Song']):
         '''
         Set text for songs (base class ItemWidgets) and insert into self.
         '''
+        # Ensure listwidget is empty
         self.clear()
-        for row, item in enumerate(songList):
-            item.setText(item.title)
-            self.insertItem(row, item)
+
+        # Enumerate through list of song objects and populate self (ListWidget)
+        for idx, item in enumerate(songList):
+            item.setText(item.title) # items are song objects, python interpreter knows this through the type hinting.
+            self.insertItem(idx, item)
 
     def loadSongs(self) -> list['Song']:
         #TODO: replace with loading from DB
@@ -48,12 +54,20 @@ class Songs(QListWidget):
 class SongsPane(QWidget):
     def __init__(self):
         super().__init__()
-        layout = QVBoxLayout()
-        self.setLayout(layout)
 
-        songs = Songs()
+        # Init layout type V(ertical)Box
+        layout = QVBoxLayout()
+
+        # Create label for songs.
         label = QLabel()
         label.setText("Songs")
 
+        # Create Songs object (extends ListWidget)
+        songs = Songs()
+        
+        # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
         layout.addWidget(songs)
+
+        # Apply layout to instantiated widget (self)
+        self.setLayout(layout)

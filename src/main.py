@@ -3,13 +3,12 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from MainWindow import MainWindow
 
 def main():
-# TODO
-#
-# App
+    # TODO
+    #
+    # App
     app = QApplication(sys.argv)
 
     # Run the main Qt loop
-    # window = MainWindow()
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
