@@ -18,20 +18,22 @@ class Song(QListWidgetItem):
 
 class Songs(QListWidget):
     '''
-    **TODO**
+    ### TODO
     '''
-    def __init__(self):
+    def __init__(self, spacing=5, wrapping=True):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
-        self.setSpacing(5)
-        self.setWrapping(True)
+        self.setSpacing(spacing)
+        self.setWrapping(wrapping)
 
+        # Create label and apply to self
         self.label = QLabel("Songs")
         self.setVisible(True)
 
         # Populate songs
         self.populate(self.loadSongs())
+
 
     def populate(self, songList: list['Song']):
         '''

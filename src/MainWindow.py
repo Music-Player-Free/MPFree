@@ -16,15 +16,15 @@ class MainWindow(QMainWindow):
         self.setMainPage()
 
     def setMainPage(self):
-        central_widget = QWidget()
         layout = QVBoxLayout()
+
+        central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
         #create panes
         panes = QWidget()
         panes_layout = QHBoxLayout()
-        panes.setLayout(panes_layout)
 
         collections = CollectionsPane()
         panes_layout.addWidget(collections)
@@ -32,6 +32,9 @@ class MainWindow(QMainWindow):
         panes_layout.addWidget(songs)
         keybinds = KeybindsPane()
         panes_layout.addWidget(keybinds)
+        
+        panes.setLayout(panes_layout)
+
 
         #create settings window
         settings = Settings()
