@@ -2,8 +2,6 @@ import sqlite3
 from abc import ABC, abstractmethod
 # from dataclasses import dataclass
 
-
-
 '''
 TODO:
 implement relations tables as classes
@@ -13,6 +11,7 @@ add id's to songs (will know how we should do this when we get to using them...?
 
 
 class DBInter(ABC):
+    @abstractmethod
     def generate_kwargs(self, data):
         d = {}
         for i, attr in enumerate(self.columns):

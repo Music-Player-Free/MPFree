@@ -1,6 +1,12 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 from db import SongDB
 
+# Move generatekwargs somewhere
+# replace 'select * from ?' with 'select (col1, col2)
+# Figure out what to do with id
+    # Load without ID, 
+    # query db to instantiate obj with lastRowID
+
 class Song(QListWidgetItem):
     '''
     Song object. \n
@@ -66,7 +72,7 @@ class Songs(QListWidget):
 
             for result in loaded:
                 kw = sdb.generate_kwargs(result)
-                instance = Song(kw)
+                instance = Song(**kw)
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
