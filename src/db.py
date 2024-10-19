@@ -1,26 +1,34 @@
 import sqlite3
+from abc import ABC, abstractmethod
+# from dataclasses import dataclass
 
+
+
+'''
+TODO:
+implement relations tables as classes
+add id's to songs (will know how we should do this when we get to using them...? (IDK!!!))
+
+'''
+
+
+class DBInter(ABC):
+    def generate_kwargs(self, data):
+        d = {}
+        for i, attr in enumerate(self.columns):
+            d[str(attr)] = data[i]
+        return d
 
 class Database:
-    # TODO:
-    # File organisation, path might change.
-
     # Init class variable path to database file
     # if not present SQLite3 will create file with this name.
     DB_PATH = "src/mpfree.db"
     def __init__(self):
+        self.table = ""
+        self.columns = ""
+
         # Init connection to database (con)
         # Init cursor to database
-
-        '''
-        Typically initialise this within the scope of a CRUD (Create, Read, Update, Delete) function.
-
-        However, at the bottom you will see two dunder ((D)ouble (UNDER)score) magic functions (https://www.geeksforgeeks.org/dunder-magic-methods-python/)
-        that are used for context managing (https://book.pythontips.com/en/latest/context_managers.html#context-managers).
-
-        This means that we can error handle by using the __exit__() function that checks whether we exited on purpose,
-        or if the program broke and threw an error.
-        '''
         self.con = sqlite3.connect(self.DB_PATH)
 
         # A cursor is SQLite's way of interacting with databases, using .execute() will act like a terminal window (in a sense).
@@ -41,23 +49,23 @@ class Database:
                         ''')
 
         self.cur.execute('''
-                        CREATE TABLE IF NOT EXISTS tags (id INT PRIMARY_KEY NOT NULL, name TEXT NOT NULL,colour TEXT NOT NULL)
+                        CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY_KEY NOT NULL, name TEXT NOT NULL,colour TEXT NOT NULL)
                         ''')
 
         self.cur.execute('''
-                        CREATE TABLE IF NOT EXISTS collections  (id INT PRIMARY KEY NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL,author)
+                        CREATE TABLE IF NOT EXISTS collections  (id INTEGER PRIMARY KEY NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL, author TEXT NOT NULL)
                         ''')
         
         self.cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs_tags (idx INT PRIMARY KEY NOT NULL, songs_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
+                        CREATE TABLE IF NOT EXISTS songs_tags (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
                         ''')
 
         self.cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs_collections (idx INT PRIMARY KEY NOT NULL, songs_id INT NOT NULL, collections_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(collections_id) REFERENCES songs(id))
+                        CREATE TABLE IF NOT EXISTS songs_collections (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, collections_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(collections_id) REFERENCES songs(id))
                         ''')
 
         self.cur.execute('''
-                        CREATE TABLE IF NOT EXISTS collections_tags(idx INT PRIMARY KEY NOT NULL, collections_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(collections_id) REFERENCES collections(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
+                        CREATE TABLE IF NOT EXISTS collections_tags(idx INTEGER PRIMARY KEY NOT NULL, collections_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(collections_id) REFERENCES collections(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
                         ''')
         self.con.commit()
 
@@ -85,10 +93,13 @@ class Database:
 
         # Free connection regardless of if we had an error.
         self.con.close()
+
+    def __repr__(self):
+        return "Connected to {}".format(self.DB_PATH)
         
 
 # Songs implementation of database connection
-class SongDB(Database):
+class SongDB(Database, DBInter):
     '''
     Database object for songs table.
     '''
@@ -105,11 +116,7 @@ class SongDB(Database):
         '''
         Insert data (list of values to pass in i.e. ["path", "darude sandstorm"...] into table
         '''
-
-
         '''
-        Write-up.
-
         To insert into sql the syntax is:
         INSERT INTO _table_ (columns) VALUES (values);
         When using sqlite in python, we use the cursor.execute() method.
@@ -135,11 +142,7 @@ class SongDB(Database):
         join takes a list as a parameter and will intersect the string between whatever is in the input list.
         Think of it as an opposite to split, "Here is sample".split(" ") returns ["Here", "is", "sample"]
         and ", ".join(["Here", "is", "sample"]) will return "Here, is, sample" (notice  how it doesn't add to the ends).
-
-        Th
         '''
-
-
 
         sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
         self.cur.execute(sql, data)
@@ -165,9 +168,111 @@ class SongDB(Database):
     def read(self, id: int) -> list:
         # for safe keeping:
         # ', '.join(self.columns)
-        sql = "SELECT * FROM songs WHERE id = ?".format(self.table)
+        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
         res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
+    
+    def generate_kwargs(self, data):
+        return super().generate_kwargs(data)
+
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+    
+
+class TagDB(Database, DBInter):
+    '''
+    Database object for songs table.
+    '''
+    def __init__(self):
+        # init database object (create tables, establish connection and cursor)
+        super().__init__()
+
+        # Create instance variable for table name and columns
+        self.table = "tags"
+        self.columns = ["text", "colour"]
+
+    def create(self, data: list) -> None:
+        '''
+        Insert data (list of values to pass in i.e. ["happy", "reddish brown"...] into table
+        '''
+        sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
+        self.cur.execute(sql, data)
+        self.con.commit()
+
+    def delete(self, id: int) -> None:
+        '''
+        Delete from databse using id value as int.
+        '''
+
+        # Will only ever have one '?' char as there is only one id.
+        sql = "DELETE FROM {} WHERE id = ?".format(self.table)
+
+        self.cur.execute(sql, (str(id),))
+        self.con.commit()
+
+    def read(self, id: int) -> list:
+        # for safe keeping:
+        # ', '.join(self.columns)
+        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
+
+        res = self.cur.execute(sql, (str(id),))
+        return res.fetchall()
+    
+    def generate_kwargs(self, data):
+        return super().generate_kwargs(data)
+
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+
+
+class CollectionDB(Database, DBInter):
+    '''
+    Database object for songs table.
+    '''
+    def __init__(self):
+        # init database object (create tables, establish connection and cursor)
+        super().__init__()
+
+        # Create instance variable for table name and columns
+        self.table = "collections"
+        self.columns = ["name", "description", "author"]
+
+
+    def create(self, data: list) -> None:
+        '''
+        Insert data (list of values to pass in i.e. ["collection2", "awesome playlist", "user2"] into table
+        '''
+        sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
+        self.cur.execute(sql, data)
+        self.con.commit()
+
+
+    def delete(self, id: int) -> None:
+        '''
+        Delete from databse using id value as int.
+        '''
+
+        # Will only ever have one '?' char as there is only one id.
+        sql = "DELETE FROM {} WHERE id = ?".format(self.table)
+        self.cur.execute(sql, (str(id),))
+        self.con.commit()
+
+    def read(self, id: int) -> list:
+        # for safe keeping:
+        # ', '.join(self.columns)
+        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
+        id = (str(id),)
+        res = self.cur.execute(sql, id)
+        return res.fetchall()
+    
+    def generate_kwargs(self, data):
+        return super().generate_kwargs(data)
+
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+
+
+
 
 
 # Impromptu test code, import song to eventually read and construct song object from database.
@@ -183,20 +288,24 @@ s = None
 # With __ as __ format is context manager. Anything within the indentation will 
 # begin the __enter__(), and anything outside, the interpreter will assume we are done (which we will be).
 with SongDB() as db:
-    db.create_tables()
     db.create([path, song_name, track_len, artist, album])
-    db.create([path, song_name, track_len, artist, album])
+    
+    # generate kwargs?
 
-
-    '''
-    TODO
-    Some work to be done here lads. Thinking of sending through **kwargs into songs
-    objects so that we can just straight up tuple(res) this shit.
-    '''
-    # res = db.read(db.cur.lastrowid)
-    # s = Song(*tuple(res))
-
+    res = db.read(db.cur.lastrowid)
+    attributes = db.generate_kwargs(res[0])
+    s = Song(**attributes)
+    print(s)
 
 
 # x = Song("")
 
+'''
+Typically initialise this within the scope of a CRUD (Create, Read, Update, Delete) function.
+
+However, at the bottom you will see two dunder ((D)ouble (UNDER)score) magic functions (https://www.geeksforgeeks.org/dunder-magic-methods-python/)
+that are used for context managing (https://book.pythontips.com/en/latest/context_managers.html#context-managers).
+
+This means that we can error handle by using the __exit__() function that checks whether we exited on purpose,
+or if the program broke and threw an error.
+'''
