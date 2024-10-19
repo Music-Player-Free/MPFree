@@ -54,13 +54,18 @@ class Songs(QListWidget):
 
     def loadSongs(self) -> list['Song']:
         #TODO: replace with loading from DB
-        db = SongDB()
-        loaded = db.read_all()
+        
+        # create list to populate outside scope
         loaded_to_songs = []
-        # hello world
-        for result in loaded:
-            instance = Song(path_to_file = result[0], song_name = result[1], track_len = result[2], artist = result[3])
-            loaded_to_songs.append(instance)
+
+        # make sure to instantiate with () after SongDB to create an object
+        with SongDB() as sdb:
+            loaded = sdb.read_all()
+            # hello world
+            kw = sdb.generate_kwargs()
+            for result in loaded:
+                instance = Song(sdb)
+                loaded_to_songs.append(instance)
 
         return loaded_to_songs
 
