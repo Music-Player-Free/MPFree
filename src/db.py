@@ -269,7 +269,7 @@ class CollectionDB(Database, DBInter):
         # for safe keeping:
         # ', '.join(self.columns)
         sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
-        res = self.cur.execute(sql, str(id))
+        res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
 
     def generate_kwargs(self, data):
