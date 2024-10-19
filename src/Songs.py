@@ -58,7 +58,7 @@ class Songs(QListWidget):
         loaded = db.read_all()
         loaded_to_songs = []
         for result in loaded:
-            instance = Song(path_to_file = result[0], song_name = result[1], track_len = result[2], artist = result[3])
+            instance = Song(path_to_file = result[1], song_name = result[2], track_len = result[3], artist = result[4])
             loaded_to_songs.append(instance)
 
         return loaded_to_songs
