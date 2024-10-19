@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from db import SongDB
 
 class Song(QListWidgetItem):
     '''
@@ -6,7 +7,7 @@ class Song(QListWidgetItem):
     Duration is a paramater passed as length of song in seconds, represented
     as integers.
     '''
-    
+
     def __init__(self, **kwargs):
         super().__init__()
         # self.db_id = kwargs['db_id']
@@ -15,7 +16,6 @@ class Song(QListWidgetItem):
 
         self.song_name = kwargs['song_name']
         self.artist = kwargs['artist']
-        self.album = kwargs['album']
         self.track_len = kwargs['track_len']
 
     def __repr__(self):
@@ -49,13 +49,19 @@ class Songs(QListWidget):
 
         # Enumerate through list of song objects and populate self (ListWidget)
         for idx, item in enumerate(songList):
-            item.setText(item.title) # items are song objects, python interpreter knows this through the type hinting.
+            item.setText(item.song_name) # items are song objects, python interpreter knows this through the type hinting.
             self.insertItem(idx, item)
 
     def loadSongs(self) -> list['Song']:
         #TODO: replace with loading from DB
-        loaded_songs = [Song(0, "/folder/song1.mp3", "song 1", "sample", 300), Song(1, "/folder/song2.mp3", "Never Gonna Give You Up", "Rick Astley", 302)]
-        return loaded_songs
+        db = SongDB()
+        loaded = db.read_all()
+        loaded_to_songs = []
+        for result in loaded:
+            instance = Song(path_to_file = result[0], song_name = result[1], track_len = result[2], artist = result[3])
+            loaded_to_songs.append(instance)
+
+        return loaded_to_songs
 
 
 class SongsPane(QWidget):
@@ -71,7 +77,7 @@ class SongsPane(QWidget):
 
         # Create Songs object (extends ListWidget)
         songs = Songs()
-        
+
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
         layout.addWidget(songs)

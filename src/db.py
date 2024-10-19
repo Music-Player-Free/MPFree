@@ -55,7 +55,7 @@ class Database:
         self.cur.execute('''
                         CREATE TABLE IF NOT EXISTS collections  (id INTEGER PRIMARY KEY NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL, author TEXT NOT NULL)
                         ''')
-        
+
         self.cur.execute('''
                         CREATE TABLE IF NOT EXISTS songs_tags (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
                         ''')
@@ -80,11 +80,11 @@ class Database:
     # Context manager cont.
     # Maybe use ext_type & traceback
     def __exit__(self, ext_type, exc_value, traceback):
-        
+
         # Start by freeing the cursor (avoids mem leaks)
         self.cur.close()
 
-        # If we pass in an exception, use the isinstance built-in function to decide if we revert any changes 
+        # If we pass in an exception, use the isinstance built-in function to decide if we revert any changes
         # (changes are .execute() statements) or if we commit them to the database (write them to memory).
         if isinstance(exc_value, Exception):
             self.con.rollback()
@@ -96,7 +96,7 @@ class Database:
 
     def __repr__(self):
         return "Connected to {}".format(self.DB_PATH)
-        
+
 
 # Songs implementation of database connection
 class SongDB(Database, DBInter):
@@ -110,7 +110,7 @@ class SongDB(Database, DBInter):
         # Create instance variable for table name and columns
         # This allows for quick modification and easier debugging.
         self.table = "songs"
-        self.columns = ["path_to_file", "song_name", "track_len", "artist", "album"]
+        self.columns = ["path_to_file", "song_name", "track_len", "artist"]
 
     def create(self, data: list) -> None:
         '''
@@ -121,9 +121,9 @@ class SongDB(Database, DBInter):
         INSERT INTO _table_ (columns) VALUES (values);
         When using sqlite in python, we use the cursor.execute() method.
         This method takes two arguments:
-            - a string representing the sql query to be executed, 
+            - a string representing the sql query to be executed,
             - and a list variable representing data to be passed into the sql query
-        
+
         so we could do something like:
         sql_query_as_string = "INSERT INTO songs (path_to_file, album,...etc) VALUES (?, ?, ?, ?)"
         data = ["/workspace1/folder1/balls.mp3", "balls album", ...]
@@ -135,7 +135,7 @@ class SongDB(Database, DBInter):
 
         Since we might want to adjust the columns (or at least have the ability to do so, forward thinking and that)
         we take the length of columns variable and create a string of '?' characters separated by ", "
-        this means if we change songs to have 12 columns, then we only have to update the columns and the (?, ?, ?, ?) 
+        this means if we change songs to have 12 columns, then we only have to update the columns and the (?, ?, ?, ?)
         will be generated dynamically.
 
         String method .join() works on the string literal ", " which is a comma and whitespace
@@ -171,13 +171,21 @@ class SongDB(Database, DBInter):
         sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
         res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
-    
+
+    #adding this because idk how to read iteratively in python without knowing the size of the table
+    def read_all(self) -> list:
+           # for safe keeping:
+           # ', '.join(self.columns)
+           sql = "SELECT * FROM {}".format(self.table)
+           res = self.cur.execute(sql)
+           return res.fetchall()
+
     def generate_kwargs(self, data):
         return super().generate_kwargs(data)
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
-    
+
 
 class TagDB(Database, DBInter):
     '''
@@ -217,7 +225,7 @@ class TagDB(Database, DBInter):
 
         res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
-    
+
     def generate_kwargs(self, data):
         return super().generate_kwargs(data)
 
@@ -264,7 +272,7 @@ class CollectionDB(Database, DBInter):
         id = (str(id),)
         res = self.cur.execute(sql, id)
         return res.fetchall()
-    
+
     def generate_kwargs(self, data):
         return super().generate_kwargs(data)
 
@@ -277,25 +285,25 @@ class CollectionDB(Database, DBInter):
 
 # Impromptu test code, import song to eventually read and construct song object from database.
 # That has not been implemented yet.
-from Songs import Song
-path = "path-to-file"
-song_name = "title"
-track_len = 302
-artist = "artist"
-album = "album"
-s = None
+#from Songs import Song
+#path = "path-to-file"
+#song_name = "title"
+#track_len = 302
+#artist = "artist"
+#album = "album"
+#s = None
 
-# With __ as __ format is context manager. Anything within the indentation will 
+# With __ as __ format is context manager. Anything within the indentation will
 # begin the __enter__(), and anything outside, the interpreter will assume we are done (which we will be).
-with SongDB() as db:
-    db.create([path, song_name, track_len, artist, album])
-    
+#with SongDB() as db:
+#    db.create([path, song_name, track_len, artist, album])
+
     # generate kwargs?
 
-    res = db.read(db.cur.lastrowid)
-    attributes = db.generate_kwargs(res[0])
-    s = Song(**attributes)
-    print(s)
+#    res = db.read(db.cur.lastrowid)
+#    attributes = db.generate_kwargs(res[0])
+#    s = Song(**attributes)
+#    print(s)
 
 
 # x = Song("")
