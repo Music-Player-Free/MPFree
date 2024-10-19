@@ -88,6 +88,7 @@ class Database:
         # (changes are .execute() statements) or if we commit them to the database (write them to memory).
         if isinstance(exc_value, Exception):
             self.con.rollback()
+            exit(ext_type)
         else:
             self.con.commit()
 

@@ -21,6 +21,7 @@ class Song(QListWidgetItem):
     def __repr__(self):
         return "Song widget "
 
+
 class Songs(QListWidget):
     '''
     ### TODO
@@ -52,6 +53,7 @@ class Songs(QListWidget):
             item.setText(item.song_name) # items are song objects, python interpreter knows this through the type hinting.
             self.insertItem(idx, item)
 
+
     def loadSongs(self) -> list['Song']:
         #TODO: replace with loading from DB
         
@@ -61,10 +63,10 @@ class Songs(QListWidget):
         # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
             loaded = sdb.read_all()
-            # hello world
-            kw = sdb.generate_kwargs()
+
             for result in loaded:
-                instance = Song(sdb)
+                kw = sdb.generate_kwargs(result)
+                instance = Song(kw)
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
