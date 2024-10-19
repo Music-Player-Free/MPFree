@@ -62,7 +62,7 @@ class Songs(QListWidget):
 
     def loadSongs(self) -> list['Song']:
         #TODO: replace with loading from DB
-        
+
         # create list to populate outside scope
         loaded_to_songs = []
 
