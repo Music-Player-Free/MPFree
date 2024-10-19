@@ -6,6 +6,7 @@ from db import SongDB
 # Figure out what to do with id
     # Load without ID, 
     # query db to instantiate obj with lastRowID
+#implement all tables
 
 class Song(QListWidgetItem):
     '''
