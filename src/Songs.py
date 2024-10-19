@@ -6,32 +6,39 @@ class Song(QListWidgetItem):
     Duration is a paramater passed as length of song in seconds, represented
     as integers.
     '''
-    def __init__(self, db_id: int, path_to_file: str, title: str, artist: str, duration: int):
+    
+    def __init__(self, **kwargs):
         super().__init__()
-        self.db_id = db_id
+        # self.db_id = kwargs['db_id']
 
-        self.path_to_file = path_to_file
+        self.path_to_file = kwargs['path_to_file']
 
-        self.title = title
-        self.artist = artist
-        self.duration = duration
+        self.song_name = kwargs['song_name']
+        self.artist = kwargs['artist']
+        self.album = kwargs['album']
+        self.track_len = kwargs['track_len']
+
+    def __repr__(self):
+        return "Song widget "
 
 class Songs(QListWidget):
     '''
-    **TODO**
+    ### TODO
     '''
-    def __init__(self):
+    def __init__(self, spacing=5, wrapping=True):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
-        self.setSpacing(5)
-        self.setWrapping(True)
+        self.setSpacing(spacing)
+        self.setWrapping(wrapping)
 
+        # Create label and apply to self
         self.label = QLabel("Songs")
         self.setVisible(True)
 
         # Populate songs
         self.populate(self.loadSongs())
+
 
     def populate(self, songList: list['Song']):
         '''
