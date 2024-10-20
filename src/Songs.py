@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 from db import SongDB
 
-# Move generatekwargs somewhere
+# M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
 # replace 'select * from ?' with 'select (col1, col2)
 # Figure out what to do with id
     # Load without ID, 
@@ -62,17 +62,16 @@ class Songs(QListWidget):
 
 
     def loadSongs(self) -> list['Song']:
-        #TODO: replace with loading from DB
-
         # create list to populate outside scope
         loaded_to_songs = []
+
 
         # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
             loaded = sdb.read_all()
 
             for result in loaded:
-                kw = sdb.generate_kwargs(result)
+                kw = {col: result[i] for i, col in enumerate(sdb.columns)}
                 instance = Song(**kw)
                 loaded_to_songs.append(instance)
 

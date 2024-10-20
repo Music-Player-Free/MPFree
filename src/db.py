@@ -6,17 +6,7 @@ from abc import ABC, abstractmethod
 TODO:
 implement relations tables as classes
 add id's to songs (will know how we should do this when we get to using them...? (IDK!!!))
-
 '''
-
-
-class DBInter(ABC):
-    @abstractmethod
-    def generate_kwargs(self, data):
-        d = {}
-        for i, attr in enumerate(self.columns):
-            d[str(attr)] = data[i]
-        return d
 
 class Database:
     # Init class variable path to database file
@@ -71,7 +61,6 @@ class Database:
 
     # Context manager stuff
     def __enter__(self):
-
         # "With" keyword call, when we "enter" an indentation space, we will return the instantiated (we know it
         # is an instance as we are using the convention "self", not "cls").
         return self
@@ -99,7 +88,7 @@ class Database:
 
 
 # Songs implementation of database connection
-class SongDB(Database, DBInter):
+class SongDB(Database):
     '''
     Database object for songs table.
     '''
@@ -116,34 +105,6 @@ class SongDB(Database, DBInter):
         '''
         Insert data (list of values to pass in i.e. ["path", "darude sandstorm"...] into table
         '''
-        '''
-        To insert into sql the syntax is:
-        INSERT INTO _table_ (columns) VALUES (values);
-        When using sqlite in python, we use the cursor.execute() method.
-        This method takes two arguments:
-            - a string representing the sql query to be executed,
-            - and a list variable representing data to be passed into the sql query
-
-        so we could do something like:
-        sql_query_as_string = "INSERT INTO songs (path_to_file, album,...etc) VALUES (?, ?, ?, ?)"
-        data = ["/workspace1/folder1/balls.mp3", "balls album", ...]
-
-        cursor.execut(sql_query_as_string, data)
-
-        the use of '?' in the sql string is a convention of Python sqlite3. The execute function will replace any '?'
-        with the data you pass in.
-
-        Since we might want to adjust the columns (or at least have the ability to do so, forward thinking and that)
-        we take the length of columns variable and create a string of '?' characters separated by ", "
-        this means if we change songs to have 12 columns, then we only have to update the columns and the (?, ?, ?, ?)
-        will be generated dynamically.
-
-        String method .join() works on the string literal ", " which is a comma and whitespace
-        join takes a list as a parameter and will intersect the string between whatever is in the input list.
-        Think of it as an opposite to split, "Here is sample".split(" ") returns ["Here", "is", "sample"]
-        and ", ".join(["Here", "is", "sample"]) will return "Here, is, sample" (notice  how it doesn't add to the ends).
-        '''
-
         sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
         self.cur.execute(sql, data)
         self.con.commit()
@@ -152,14 +113,6 @@ class SongDB(Database, DBInter):
         '''
         Delete from databse using id value as int.
         '''
-
-
-        # try:
-        #     str(id)
-        #     pass
-        # except ValueError:
-        #     pass
-
         # Will only ever have one '?' char as there is only one id.
         sql = "DELETE FROM {} WHERE id = ?".format(self.table)
         self.cur.execute(sql, (str(id),))
@@ -180,14 +133,11 @@ class SongDB(Database, DBInter):
            res = self.cur.execute(sql)
            return res.fetchall()
 
-    def generate_kwargs(self, data):
-        return super().generate_kwargs(data)
-
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-class TagDB(Database, DBInter):
+class TagDB(Database):
     '''
     Database object for songs table.
     '''
@@ -226,14 +176,11 @@ class TagDB(Database, DBInter):
         res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
 
-    def generate_kwargs(self, data):
-        return super().generate_kwargs(data)
-
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-class CollectionDB(Database, DBInter):
+class CollectionDB(Database):
     '''
     Database object for songs table.
     '''
@@ -266,53 +213,12 @@ class CollectionDB(Database, DBInter):
         self.con.commit()
 
     def read(self, id: int) -> list:
-        # for safe keeping:
-        # ', '.join(self.columns)
         sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
         res = self.cur.execute(sql, (str(id),))
         return res.fetchall()
 
-    def generate_kwargs(self, data):
-        return super().generate_kwargs(data)
-
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-
-
-
-
-# Impromptu test code, import song to eventually read and construct song object from database.
-# That has not been implemented yet.
-#from Songs import Song
-#path = "path-to-file"
-#song_name = "title"
-#track_len = 302
-#artist = "artist"
-#album = "album"
-#s = None
-
-# With __ as __ format is context manager. Anything within the indentation will
-# begin the __enter__(), and anything outside, the interpreter will assume we are done (which we will be).
-#with SongDB() as db:
-#    db.create([path, song_name, track_len, artist, album])
-
-    # generate kwargs?
-
-#    res = db.read(db.cur.lastrowid)
-#    attributes = db.generate_kwargs(res[0])
-#    s = Song(**attributes)
-#    print(s)
-
-
-# x = Song("")
-
-'''
-Typically initialise this within the scope of a CRUD (Create, Read, Update, Delete) function.
-
-However, at the bottom you will see two dunder ((D)ouble (UNDER)score) magic functions (https://www.geeksforgeeks.org/dunder-magic-methods-python/)
-that are used for context managing (https://book.pythontips.com/en/latest/context_managers.html#context-managers).
-
-This means that we can error handle by using the __exit__() function that checks whether we exited on purpose,
-or if the program broke and threw an error.
-'''
+with SongDB() as sdb:
+    print(sdb.cur.execute("SELECT * from songs where id = ?", (90,)).fetchall())
