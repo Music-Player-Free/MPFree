@@ -1,0 +1,32 @@
+all examples of accessing database
+
+we need to load in the 
+
+# # we need a way to get all songs 
+- populate all collections (maybe)
+- load x amount of songs (x=limit) with "all" songs
+
+all songs will repurpose collections but have no id, no database entry 
+
+
+when collection clicked, query database with:
+select (all needed cols) from songs join where collection_id = collection.id 
+
+
+we dont keep them in memory 
+
+on startup:
+collections are loaded with ONLY id and name of collection
+dont load middle pane YET
+when collection clicked, songspane.songs.populate(results from collection db query)
+
+
+NOTE TO SELF MULTI CURSORS 
+
+
+need user to set limit
+settings  = JSON
+have songs load up to limit
+
+
+@cache decorator for populate (COULD)

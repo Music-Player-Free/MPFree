@@ -66,6 +66,7 @@ class Songs(QListWidget):
         loaded_to_songs = []
 
 
+        # limit songs 
         # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
             loaded = sdb.read_all()
@@ -76,6 +77,7 @@ class Songs(QListWidget):
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
+    
 
 
 class SongsPane(QWidget):
