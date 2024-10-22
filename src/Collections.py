@@ -1,6 +1,11 @@
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QStyleOptionTab, QVBoxLayout, QLabel, QListView, QWidget
+from collections import defaultdict # might not need this
+from functools import lru_cache
 
 from db import CollectionDB
+
+# Since a dictionary is used to cache results, the positional and keyword arguments to the function must be hashable.
+# ^^^ this is for functools.cache if we want to use that.
 
 
 
@@ -10,7 +15,7 @@ class Collection(QListWidgetItem):
     Takes integer id and string name as input
     '''
 
-    def __init__(self, db_id:int, name: str):
+    def __init__(self, db_id: int, name: str):
         super().__init__()
         self.name = name
 
