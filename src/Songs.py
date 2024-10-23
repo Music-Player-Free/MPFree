@@ -4,7 +4,7 @@ from db import SongDB
 # M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
 # replace 'select * from ?' with 'select (col1, col2)
 # Figure out what to do with id
-    # Load without ID, 
+    # Load without ID,
     # query db to instantiate obj with lastRowID
 #implement all tables
 
@@ -33,7 +33,7 @@ class Songs(QListWidget):
     '''
     ### TODO
     '''
-    def __init__(self, spacing=5, wrapping=True):
+    def __init__(self, spacing=5, wrapping=False):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
@@ -66,7 +66,7 @@ class Songs(QListWidget):
         loaded_to_songs = []
 
 
-        # limit songs 
+        # limit songs
         # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
             loaded = sdb.read_all()
@@ -77,7 +77,7 @@ class Songs(QListWidget):
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
-    
+
 
 
 class SongsPane(QWidget):
