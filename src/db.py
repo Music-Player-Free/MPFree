@@ -4,8 +4,7 @@ from abc import ABC, abstractmethod
 
 '''
 TODO:
-implement relations tables as classes
-add id's to songs (will know how we should do this when we get to using them...? (IDK!!!))
+test that all implementations work as needed (scared about tags)
 '''
 
 class Database:
@@ -87,13 +86,52 @@ class Database:
         return "Connected to {}".format(self.DB_PATH)
 
 
+class DBInter(ABC):
+    @abstractmethod
+    def create(cls: 'Database', data: list) -> None:
+        '''
+        Insert data (list of values to pass in i.e. ["path", "darude sandstorm"...]) into table.
+        '''
+
+        sql = "INSERT INTO {} ({}) VALUES ({})".format(cls.table,
+                                                       ", ".join(cls.columns[1:]), 
+                                                       ', '.join(['?']*len(cls.columns[1:]))
+                                                       )
+        
+        cls.cur.execute(sql, data)
+        cls.con.commit()
+
+    @abstractmethod
+    def delete(cls: 'Database', id: int) -> None:
+        '''
+        Delete from databse using id value as int.
+        '''
+
+        sql = "DELETE FROM {} WHERE id = ?".format(cls.table)
+        cls.cur.execute(sql, (str(id),))
+        cls.con.commit()
+
+
+    def read(cls: 'Database', id: int) -> list:
+        sql = "SELECT * FROM {} WHERE id = ?".format(cls.table)
+        res = cls.cur.execute(sql, (str(id),))
+        return res.fetchall()
+
+    #adding this because idk how to read iteratively in python without knowing the size of the table
+    def read_all(cls: 'Database') -> list:
+           sql = "SELECT {} FROM {}".format(",".join(cls.columns), 
+                                            cls.table)
+           res = cls.cur.execute(sql)
+           return res.fetchall()
+
+
+
 # Songs implementation of database connection
-class SongDB(Database):
+class SongDB(Database, DBInter):
     '''
     Database object for songs table.
     '''
     def __init__(self):
-        # init database object (create tables, establish connection and cursor)
         super().__init__()
 
         # Create instance variable for table name and columns
@@ -101,43 +139,23 @@ class SongDB(Database):
         self.table = "songs"
         self.columns = ["path_to_file", "song_name", "track_len", "artist"]
 
-    def create(self, data: list) -> None:
-        '''
-        Insert data (list of values to pass in i.e. ["path", "darude sandstorm"...] into table
-        '''
-        sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
-        self.cur.execute(sql, data)
-        self.con.commit()
-
-    def delete(self, id: int) -> None:
-        '''
-        Delete from databse using id value as int.
-        '''
-        # Will only ever have one '?' char as there is only one id.
-        sql = "DELETE FROM {} WHERE id = ?".format(self.table)
-        self.cur.execute(sql, (str(id),))
-        self.con.commit()
-
-    def read(self, id: int) -> list:
-        # for safe keeping:
-        # ', '.join(self.columns)
-        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
-        res = self.cur.execute(sql, (str(id),))
-        return res.fetchall()
-
-    #adding this because idk how to read iteratively in python without knowing the size of the table
-    def read_all(self) -> list:
-           # for safe keeping:
-           # ', '.join(self.columns)
-           sql = "SELECT * FROM {}".format(self.table)
-           res = self.cur.execute(sql)
-           return res.fetchall()
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-class TagDB(Database):
+class TagDB(Database, DBInter):
     '''
     Database object for songs table.
     '''
@@ -147,40 +165,25 @@ class TagDB(Database):
 
         # Create instance variable for table name and columns
         self.table = "tags"
-        self.columns = ["text", "colour"]
+        self.columns = ["id", "name", "colour"]
 
-    def create(self, data: list) -> None:
-        '''
-        Insert data (list of values to pass in i.e. ["happy", "reddish brown"...] into table
-        '''
-        sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
-        self.cur.execute(sql, data)
-        self.con.commit()
-
-    def delete(self, id: int) -> None:
-        '''
-        Delete from databse using id value as int.
-        '''
-
-        # Will only ever have one '?' char as there is only one id.
-        sql = "DELETE FROM {} WHERE id = ?".format(self.table)
-
-        self.cur.execute(sql, (str(id),))
-        self.con.commit()
-
-    def read(self, id: int) -> list:
-        # for safe keeping:
-        # ', '.join(self.columns)
-        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
-
-        res = self.cur.execute(sql, (str(id),))
-        return res.fetchall()
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-class CollectionDB(Database):
+class CollectionDB(Database, DBInter):
     '''
     Database object for songs table.
     '''
@@ -190,35 +193,85 @@ class CollectionDB(Database):
 
         # Create instance variable for table name and columns
         self.table = "collections"
-        self.columns = ["name", "description", "author"]
+        self.columns = ["id", "name", "description", "author"]
 
-
-    def create(self, data: list) -> None:
-        '''
-        Insert data (list of values to pass in i.e. ["collection2", "awesome playlist", "user2"] into table
-        '''
-        sql = "INSERT INTO {} ({}) VALUES ({})".format(self.table, ", ".join(self.columns), ', '.join(['?']*len(self.columns)))
-        self.cur.execute(sql, data)
-        self.con.commit()
-
-
-    def delete(self, id: int) -> None:
-        '''
-        Delete from databse using id value as int.
-        '''
-
-        # Will only ever have one '?' char as there is only one id.
-        sql = "DELETE FROM {} WHERE id = ?".format(self.table)
-        self.cur.execute(sql, (str(id),))
-        self.con.commit()
-
-    def read(self, id: int) -> list:
-        sql = "SELECT * FROM {} WHERE id = ?".format(self.table)
-        res = self.cur.execute(sql, (str(id),))
-        return res.fetchall()
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-with SongDB() as sdb:
-    print(sdb.cur.execute("SELECT * from songs where id = ?", (90,)).fetchall())
+class Songs_Tags(Database, DBInter):
+    def __init__(self):
+        super().__init__()
+
+        self.table = "songs_tags"
+        self.columns = ["idx", "songs_id", "tags_id"]
+
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
+        
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+    
+class Songs_Collections(Database, DBInter):
+    def __init__(self):
+        super().__init__()
+
+        self.table = "songs_collections"
+        self.columns = ["idx", "songs_id", "collections_id"]
+
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
+        
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+    
+class Collections_Tags(Database, DBInter):
+    def __init__(self):
+        super().__init__()
+
+        self.table = "collections_tags"
+        self.columns = ["idx", "collections_id", "tags_id"]
+
+    def create(self, data):
+        return super().create(data)
+    
+    def delete(self, id):
+        return super().delete(id)
+    
+    def read(self, id):
+        return super().read(id)
+    
+    def read_all(self):
+        return super().read_all()
+        
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
