@@ -31,7 +31,7 @@ class Song(QListWidgetItem):
 
 class Songs(QListWidget):
     '''
-    ### TODO
+    
     '''
     def __init__(self, spacing=5, wrapping=True):
         super().__init__()
@@ -45,7 +45,7 @@ class Songs(QListWidget):
         self.setVisible(True)
 
         # Populate songs
-        self.populate(self.loadSongs())
+        self.populate(self.load_songs())
 
 
     def populate(self, songList: list['Song']):
@@ -61,42 +61,13 @@ class Songs(QListWidget):
             self.insertItem(idx, item)
 
 
-    def loadSongs(self) -> list['Song']:
-        # create list to populate outside scope
+    def load_songs(self) -> list['Song']:
         loaded_to_songs = []
 
-
-        # limit songs 
-        # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
-            loaded = sdb.read_all()
-
-            for result in loaded:
+            for result in sdb.read_all():
                 kw = {col: result[i] for i, col in enumerate(sdb.columns)}
                 instance = Song(**kw)
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
-    
-
-
-class SongsPane(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        # Init layout type V(ertical)Box
-        layout = QVBoxLayout()
-
-        # Create label for songs.
-        label = QLabel()
-        label.setText("Songs")
-
-        # Create Songs object (extends ListWidget)
-        songs = Songs()
-
-        # Add widgets to the layout (following (V)ertical box format)
-        layout.addWidget(label)
-        layout.addWidget(songs)
-
-        # Apply layout to instantiated widget (self)
-        self.setLayout(layout)

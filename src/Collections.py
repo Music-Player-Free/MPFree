@@ -7,6 +7,19 @@ from db import CollectionDB
 # Since a dictionary is used to cache results, the positional and keyword arguments to the function must be hashable.
 # ^^^ this is for functools.cache if we want to use that.
 
+'''
+CollectionS (widget) will poulate itself with ALL collections of the db.
+collections -> populate -> load db -> create collection using id gathered
+
+populate:
+    create db instance
+    res = readall()
+    for row in res:
+        create widget (input=row)
+        self(coll).append new coll widget
+
+
+'''
 
 
 class Collection(QListWidgetItem): 
@@ -22,15 +35,15 @@ class Collection(QListWidgetItem):
 
 
 class Collections(QListWidget): # Displays collections
-    def __init__(self):
+    def __init__(self, spacing:int = 5, wrapping:bool = True):
         super().__init__()
-        self.setSpacing(5)
-        self.setWrapping(True)
+        self.setSpacing(spacing)
+        self.setWrapping(wrapping)
+
         self.label = QLabel("Collections")
         self.setVisible(True)
 
         self.populate(self.loadCollections())
-        # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QListWidget.html
 
 
     def populate(self, collectionList: list['Collection']):
@@ -41,33 +54,10 @@ class Collections(QListWidget): # Displays collections
 
 
     def loadCollections(self) -> list['Collection']:
-        #TODO: replace with loading from DB
-        print('here!')
-
         # Mock list of collection objects
+        load = []
         with CollectionDB() as cdb:
-            print(cdb.read(1))
-
-        loaded_collections = [Collection(0,"My Playlist"), Collection(1,"Cool Album")]
-        return loaded_collections
-
-
-
-class CollectionsPane(QWidget):
-    def __init__(self):
-        super().__init__()
-        layout = QVBoxLayout()
-
-        # Get collections
-        collections = Collections()
-        # Set label for widget
-        label = QLabel()
-        label.setText("Collections")
-
-        # Add label and widget to layout
-        layout.addWidget(label)
-        layout.addWidget(collections)
+            print(cdb.read_all())
+            pass
+        return load
         
-        # apply layout to instance of Collections pane (self)
-        self.setLayout(layout)
-

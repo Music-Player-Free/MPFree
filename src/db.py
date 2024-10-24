@@ -19,9 +19,6 @@ class Database:
         # Init cursor to database
         self.con = sqlite3.connect(self.DB_PATH)
 
-        # A cursor is SQLite's way of interacting with databases, using .execute() will act like a terminal window (in a sense).
-        self.cur = self.con.cursor()
-
         # Create tables if not already existing (error checking using sqlite convention 'IF NOT EXISTS')
         self.create_tables()
 
@@ -32,29 +29,31 @@ class Database:
         Please note that the formatting is single-line to avoid redundant whitespacing.
         To see the properly formatted schemas (tables) please go to "/src/schema.txt."
         '''
-        self.cur.execute('''
+        cur = self.con.cursor()
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS songs (id INTEGER PRIMARY KEY, path_to_file TEXT NOT NULL, song_name TEXT NOT NULL,track_len INTEGER NOT NULL, artist TEXT NOT NULL,album TEXT NOT NULL)
                         ''')
 
-        self.cur.execute('''
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY_KEY NOT NULL, name TEXT NOT NULL,colour TEXT NOT NULL)
                         ''')
 
-        self.cur.execute('''
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS collections  (id INTEGER PRIMARY KEY NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL, author TEXT NOT NULL)
                         ''')
 
-        self.cur.execute('''
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS songs_tags (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
                         ''')
 
-        self.cur.execute('''
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS songs_collections (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, collections_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(collections_id) REFERENCES songs(id))
                         ''')
 
-        self.cur.execute('''
+        cur.execute('''
                         CREATE TABLE IF NOT EXISTS collections_tags(idx INTEGER PRIMARY KEY NOT NULL, collections_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(collections_id) REFERENCES collections(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
                         ''')
+        cur.close()
         self.con.commit()
 
 
@@ -67,10 +66,6 @@ class Database:
     # Context manager cont.
     # Maybe use ext_type & traceback
     def __exit__(self, ext_type, exc_value, traceback):
-
-        # Start by freeing the cursor (avoids mem leaks)
-        self.cur.close()
-
         # If we pass in an exception, use the isinstance built-in function to decide if we revert any changes
         # (changes are .execute() statements) or if we commit them to the database (write them to memory).
         if isinstance(exc_value, Exception):
@@ -92,13 +87,14 @@ class DBInter(ABC):
         '''
         Insert data (list of values to pass in i.e. ["path", "darude sandstorm"...]) into table.
         '''
-
+        cur = cls.con.cursor()
         sql = "INSERT INTO {} ({}) VALUES ({})".format(cls.table,
                                                        ", ".join(cls.columns[1:]), 
                                                        ', '.join(['?']*len(cls.columns[1:]))
                                                        )
         
-        cls.cur.execute(sql, data)
+        cur.execute(sql, data)
+        cur.close()
         cls.con.commit()
 
     @abstractmethod
@@ -106,23 +102,30 @@ class DBInter(ABC):
         '''
         Delete from databse using id value as int.
         '''
-
+        cur = cls.con.cursor()
         sql = "DELETE FROM {} WHERE id = ?".format(cls.table)
-        cls.cur.execute(sql, (str(id),))
+        cur.execute(sql, (str(id),))
+        cur.close()
         cls.con.commit()
 
-
-    def read(cls: 'Database', id: int) -> list:
+    @abstractmethod
+    def read(cls: 'Database', id: int) -> sqlite3.Cursor:
+        cur = cls.con.cursor()
         sql = "SELECT * FROM {} WHERE id = ?".format(cls.table)
-        res = cls.cur.execute(sql, (str(id),))
-        return res.fetchall()
+        return cur.execute(sql, (str(id),))
 
-    #adding this because idk how to read iteratively in python without knowing the size of the table
-    def read_all(cls: 'Database') -> list:
-           sql = "SELECT {} FROM {}".format(",".join(cls.columns), 
-                                            cls.table)
-           res = cls.cur.execute(sql)
-           return res.fetchall()
+    @abstractmethod
+    def read_all(cls: 'Database') -> sqlite3.Cursor:
+        cur = cls.con.cursor()
+        sql = "SELECT {} FROM {}".format(",".join(cls.columns), 
+                                        cls.table)
+        return cur.execute(sql)
+        # readed = [] # Dalton code
+        # cls.cur.execute(sql)
+        # for row in cls.cur:
+        #     readed.append(row)
+        # return readed
+
 
 
 
@@ -133,9 +136,6 @@ class SongDB(Database, DBInter):
     '''
     def __init__(self):
         super().__init__()
-
-        # Create instance variable for table name and columns
-        # This allows for quick modification and easier debugging.
         self.table = "songs"
         self.columns = ["path_to_file", "song_name", "track_len", "artist"]
 
@@ -153,6 +153,7 @@ class SongDB(Database, DBInter):
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
+
 
 
 class TagDB(Database, DBInter):
@@ -183,6 +184,7 @@ class TagDB(Database, DBInter):
         return "{} table ".format(self.table) + super().__repr__()
 
 
+
 class CollectionDB(Database, DBInter):
     '''
     Database object for songs table.
@@ -210,6 +212,8 @@ class CollectionDB(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
+
+
 class Songs_Tags(Database, DBInter):
     def __init__(self):
         super().__init__()
@@ -232,6 +236,8 @@ class Songs_Tags(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
     
+
+
 class Songs_Collections(Database, DBInter):
     def __init__(self):
         super().__init__()
@@ -254,6 +260,8 @@ class Songs_Collections(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
     
+
+
 class Collections_Tags(Database, DBInter):
     def __init__(self):
         super().__init__()
