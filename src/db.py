@@ -63,14 +63,14 @@ class Database:
         # is an instance as we are using the convention "self", not "cls").
         return self
 
-    # Context manager cont.
+    # Context manager cont.j
     # Maybe use ext_type & traceback
     def __exit__(self, ext_type, exc_value, traceback):
         # If we pass in an exception, use the isinstance built-in function to decide if we revert any changes
         # (changes are .execute() statements) or if we commit them to the database (write them to memory).
         if isinstance(exc_value, Exception):
             self.con.rollback()
-            exit(ext_type)
+            exit(ext_type, traceback)
         else:
             self.con.commit()
 
@@ -103,30 +103,26 @@ class DBInter(ABC):
         Delete from databse using id value as int.
         '''
         cur = cls.con.cursor()
-        sql = "DELETE FROM {} WHERE id = ?".format(cls.table)
+        sql = "DELETE FROM {} WHERE id in ?".format(cls.table)
         cur.execute(sql, (str(id),))
         cur.close()
         cls.con.commit()
 
     @abstractmethod
-    def read(cls: 'Database', id: int) -> sqlite3.Cursor:
+    def read(cls: 'Database', id: list[int]) -> sqlite3.Cursor:
         cur = cls.con.cursor()
-        sql = "SELECT * FROM {} WHERE id = ?".format(cls.table)
-        return cur.execute(sql, (str(id),))
+        sql = "SELECT {} FROM {} WHERE id IN ({})".format(", ".join(cls.columns),
+                                                    cls.table,
+                                                    ", ".join("?" for _ in range(len(id))))
+        return cur.execute(sql, id)
 
     @abstractmethod
     def read_all(cls: 'Database') -> sqlite3.Cursor:
         cur = cls.con.cursor()
-        sql = "SELECT {} FROM {}".format(",".join(cls.columns), 
+        sql = "SELECT {} FROM {}".format(", ".join(cls.columns), 
                                         cls.table)
         return cur.execute(sql)
-        # readed = [] # Dalton code
-        # cls.cur.execute(sql)
-        # for row in cls.cur:
-        #     readed.append(row)
-        # return readed
-
-
+    
 
 
 # Songs implementation of database connection
@@ -137,19 +133,20 @@ class SongDB(Database, DBInter):
     def __init__(self):
         super().__init__()
         self.table = "songs"
-        self.columns = ["path_to_file", "song_name", "track_len", "artist"]
+        self.columns = ["id", "path_to_file", "song_name", "track_len", "artist"]
 
-    def create(self, data):
+    def create(self, data: list):
         return super().create(data)
     
-    def delete(self, id):
+    def delete(self, id: list[int]):
         return super().delete(id)
     
-    def read(self, id):
+    def read(self, id: list[int]):
         return super().read(id)
     
     def read_all(self):
         return super().read_all()
+    
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
@@ -179,6 +176,7 @@ class TagDB(Database, DBInter):
     
     def read_all(self):
         return super().read_all()
+    
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
@@ -190,7 +188,6 @@ class CollectionDB(Database, DBInter):
     Database object for songs table.
     '''
     def __init__(self):
-        # init database object (create tables, establish connection and cursor)
         super().__init__()
 
         # Create instance variable for table name and columns
@@ -212,50 +209,52 @@ class CollectionDB(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
+# ------------------------------------------------------- #
+
+class RelationInter(ABC):
+    @abstractmethod
+    def read(self: 'Database', index: int, id: list[int]):
+        '''
+        Read from relation table. Index is strictly either 0 or 1. \n
+        0/1 maps to the words in table name, <br>
+        songs_collections maps 0 to songs and 1 maps to collections.
+        '''
+        cur = self.con.cursor()
+
+        # Create args 
+        assert 0 <= index <= 1
+        assert isinstance(id, list)
+
+        args = [self.columns[1 + ((index + i) % 2)] for i in range(2)] # either [1,2] or [2,1]
+        args.insert(1, self.table)
+
+        sql = "select {} from {} where {} = ?".format(*args)
+        
+        ans = cur.execute(sql, id)
+        return ans
 
 
-class Songs_Tags(Database, DBInter):
+class Songs_Tags(Database, RelationInter): 
     def __init__(self):
         super().__init__()
 
         self.table = "songs_tags"
         self.columns = ["idx", "songs_id", "tags_id"]
 
-    def create(self, data):
-        return super().create(data)
-    
-    def delete(self, id):
-        return super().delete(id)
-    
-    def read(self, id):
-        return super().read(id)
-    
-    def read_all(self):
-        return super().read_all()
-        
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
     
 
 
-class Songs_Collections(Database, DBInter):
+class Songs_Collections(Database, RelationInter):
     def __init__(self):
         super().__init__()
 
         self.table = "songs_collections"
         self.columns = ["idx", "songs_id", "collections_id"]
 
-    def create(self, data):
-        return super().create(data)
-    
-    def delete(self, id):
-        return super().delete(id)
-    
-    def read(self, id):
-        return super().read(id)
-    
-    def read_all(self):
-        return super().read_all()
+    def read(self, index, id):
+        return super().read(index, id)
         
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
@@ -269,17 +268,6 @@ class Collections_Tags(Database, DBInter):
         self.table = "collections_tags"
         self.columns = ["idx", "collections_id", "tags_id"]
 
-    def create(self, data):
-        return super().create(data)
-    
-    def delete(self, id):
-        return super().delete(id)
-    
-    def read(self, id):
-        return super().read(id)
-    
-    def read_all(self):
-        return super().read_all()
         
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()

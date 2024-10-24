@@ -2,23 +2,16 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QStyleOptionTab, QVB
 from collections import defaultdict # might not need this
 from functools import lru_cache
 
-from db import CollectionDB
+from Songs import Song, Songs
+from db import CollectionDB, SongDB, Songs_Collections
 
 # Since a dictionary is used to cache results, the positional and keyword arguments to the function must be hashable.
 # ^^^ this is for functools.cache if we want to use that.
 
 '''
-CollectionS (widget) will poulate itself with ALL collections of the db.
-collections -> populate -> load db -> create collection using id gathered
-
-populate:
-    create db instance
-    res = readall()
-    for row in res:
-        create widget (input=row)
-        self(coll).append new coll widget
-
-
+collection needs a button
+button will load songs into the songs pane
+button needs to show its been clicked
 '''
 
 
@@ -28,10 +21,13 @@ class Collection(QListWidgetItem):
     Takes integer id and string name as input
     '''
 
-    def __init__(self, db_id: int, name: str):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.name = name
+        self.id = kwargs['id']
 
+        self.name = kwargs['name']
+        self.description = kwargs['description']
+        self.author = kwargs['author']
 
 
 class Collections(QListWidget): # Displays collections
@@ -43,21 +39,46 @@ class Collections(QListWidget): # Displays collections
         self.label = QLabel("Collections")
         self.setVisible(True)
 
-        self.populate(self.loadCollections())
+        self.populate(self.load_collections())
 
-
-    def populate(self, collectionList: list['Collection']):
+    def populate(self, collection_list: list['Collection']):
         self.clear()
-        for row, item in enumerate(collectionList):
+        for row, item in enumerate(collection_list):
             item.setText(item.name)
             self.insertItem(row, item)
 
+    def insert_to_pane(self, item: Collection): # This could be just id?
+        # R̶e̶c̶i̶e̶v̶e̶ ̶i̶t̶e̶m̶:̶ ̶c̶o̶l̶l̶ ̶o̶b̶j̶
+        # G̶e̶t̶ ̶a̶l̶l̶ ̶s̶o̶n̶g̶s̶ ̶a̶s̶s̶o̶c̶i̶a̶t̶e̶d̶
+        # Create songs object 
+        # set song pane to new songs
+        new_pane = Songs()
 
-    def loadCollections(self) -> list['Collection']:
+        with SongDB() as db:
+            id_list = Songs_Collections().read(0, [item.id]).fetchall()
+            id_list = [x[0] for x in id_list]
+
+
+            count = 1
+            for row in db.read(id_list):
+                kw = {col: row[i] for i, col in enumerate(db.columns)}
+                inst = Song(**kw)
+
+                new_pane.insertItem(count, inst.song_name)
+                count += 1
+        return new_pane
+
+    def load_collections(self) -> list['Collection']:
         # Mock list of collection objects
         load = []
-        with CollectionDB() as cdb:
-            print(cdb.read_all())
-            pass
+        with CollectionDB() as db:
+            # Read from DB
+            for row in db.read_all():
+                # Create collection objs
+                kw = {col: row[i] for i, col in enumerate(db.columns)}
+                inst = Collection(**kw)
+
+                # add to list
+                load.append(inst)
         return load
         

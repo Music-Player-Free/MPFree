@@ -68,3 +68,13 @@ CREATE TABLE collections_tags
     FOREIGN KEY(collections_id) REFERENCES collections(id),
     FOREIGN KEY(tags_id) REFERENCES tags(id)
 );
+
+;
+
+select * from songs where id in (select songs_id from songs_collections where collections_id = 1);
+
+select id 
+from songs 
+join songs_collections on songs.id = songs_collections.songs_id
+join collections on collections.id = songs_collections.collections_id
+where collections.id = __blank__;

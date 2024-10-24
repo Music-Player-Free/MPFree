@@ -7,14 +7,16 @@ class CollectionsPane(QWidget):
         layout = QVBoxLayout()
 
         # Get collections
-        collections = Collections()
+        self.collections = Collections()
+        self.collections.itemClicked.connect(self.collections.insert_to_pane)
+
         # Set label for widget
         label = QLabel()
         label.setText("Collections")
 
         # Add label and widget to layout
         layout.addWidget(label)
-        layout.addWidget(collections)
+        layout.addWidget(self.collections)
         
         # apply layout to instance of Collections pane (self)
         self.setLayout(layout)
@@ -31,11 +33,11 @@ class SongsPane(QWidget):
         label.setText("Songs")
 
         # Create Songs object (extends ListWidget)
-        songs = Songs()
+        self.songs = Songs()
 
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
-        layout.addWidget(songs)
+        layout.addWidget(self.songs)
 
         # Apply layout to instantiated widget (self)
         self.setLayout(layout)
