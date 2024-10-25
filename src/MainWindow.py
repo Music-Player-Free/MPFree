@@ -25,14 +25,14 @@ class MainWindow(QMainWindow):
         panes = QWidget()
         panes_layout = QHBoxLayout()
 
-        collections = CollectionsPane()
         songs = SongsPane()
+        collections = CollectionsPane(songs)
         keybinds = KeybindsPane()
 
         panes_layout.addWidget(collections)
         panes_layout.addWidget(songs)
         panes_layout.addWidget(keybinds)
-        
+
         panes.setLayout(panes_layout)
 
 
