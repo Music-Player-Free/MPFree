@@ -37,7 +37,7 @@ class Collections(QListWidget): # Displays collections
         super().__init__()
         self.setSpacing(5)
         self.setWrapping(True)
-        self.songs_ref: Songs
+        self.songs_ref: Songs # Get a reference to Songs List Widget, given on app startup inside MainWindow.py
 
         self.label = QLabel("Collections")
         self.setVisible(True)
@@ -45,7 +45,7 @@ class Collections(QListWidget): # Displays collections
         self.populate(self.load_collections())
         self.itemClicked.connect(self.populate_from_collection)
 
-    def set_songs_ref(self, songs: Songs):
+    def set_songs_ref(self, songs: Songs): # Set reference to Songs List Widget, given on app startup inside MainWindow.py
         self.songs_ref = songs
 
     def populate(self, collection_list: list['Collection']):
@@ -58,7 +58,7 @@ class Collections(QListWidget): # Displays collections
         self.songs_ref.populate(self.get_songs_from_collection(item))
 
 
-    def get_songs_from_collection(self, item: Collection) -> list['Song']: # This could be just id?
+    def get_songs_from_collection(self, item: Collection) -> list['Song']:
         #Get ID when item clicked
         #Get all songs with that Song-Collection Relationship
         #Create song object for each and populate collections with that

@@ -28,7 +28,8 @@ class MainWindow(QMainWindow):
 
         collections = CollectionsPane()
         songs = SongsPane()
-        collections.collections.set_songs_ref(songs.songs)
+        collections.collections.set_songs_ref(songs.songs) # Should consider renaming this. First songs is the pane,
+                                                           # second is the real Songs class. Same with collections.collections
         keybinds = KeybindsPane()
 
         panes_layout.addWidget(collections)
@@ -37,14 +38,11 @@ class MainWindow(QMainWindow):
 
         panes.setLayout(panes_layout)
 
-
         #create settings window
         settings = Settings()
 
         #add panes and settings to toggleable widget
         stacked = ToggleWidget(panes, settings)
-
-
 
         #create bottom bar
         bottom_bar = BottomBar(stacked)
