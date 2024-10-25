@@ -7,6 +7,7 @@ from Keybinds import KeybindsPane
 from BottomBar import *
 from Settings import Settings
 from panes import *
+from Collections import Collection
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,12 +26,14 @@ class MainWindow(QMainWindow):
         panes = QWidget()
         panes_layout = QHBoxLayout()
 
-        collections = CollectionsPane()
-        songs = SongsPane()
+        c_pane = CollectionsPane()
+        s_pane = SongsPane()
         keybinds = KeybindsPane()
+        c_pane.collections.itemClicked.connect(
+            lambda x: s_pane.insert_to_pane(x.id))
 
-        panes_layout.addWidget(collections)
-        panes_layout.addWidget(songs)
+        panes_layout.addWidget(c_pane)
+        panes_layout.addWidget(s_pane)
         panes_layout.addWidget(keybinds)
         
         panes.setLayout(panes_layout)

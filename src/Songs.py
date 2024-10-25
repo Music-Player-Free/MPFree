@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
-from db import SongDB
+
+from db import SongDB, CollectionDB, Songs_Collections
 
 # M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
 #̶ ̶r̶e̶p̶l̶a̶c̶e̶ ̶'̶s̶e̶l̶e̶c̶t̶ ̶*̶ ̶f̶r̶o̶m̶ ̶?̶'̶ ̶w̶i̶t̶h̶ ̶'̶s̶e̶l̶e̶c̶t̶ ̶(̶c̶o̶l̶1̶,̶ ̶c̶o̶l̶2̶)̶
@@ -72,3 +73,6 @@ class Songs(QListWidget):
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
+    
+    def __repr__(self):
+        return "Songs Object {}".format(self.items()[0])

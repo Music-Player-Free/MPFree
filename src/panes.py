@@ -8,7 +8,6 @@ class CollectionsPane(QWidget):
 
         # Get collections
         self.collections = Collections()
-        self.collections.itemClicked.connect(self.collections.insert_to_pane)
 
         # Set label for widget
         label = QLabel()
@@ -41,3 +40,20 @@ class SongsPane(QWidget):
 
         # Apply layout to instantiated widget (self)
         self.setLayout(layout)
+
+    def insert_to_pane(self, id: int):
+        li = []
+
+        with SongDB() as db:
+            id_list = Songs_Collections().read(0, [id]).fetchall()
+            id_list = [x[0] for x in id_list]
+            
+            for row in db.read(id_list):
+                kw = {col: row[i] for i, col in enumerate(db.columns)}
+                inst = Song(**kw)
+
+                li.append(inst)
+        self.songs.populate(li)
+
+    def __repr__(self):
+        return "Songs Pane: {}".format(self.songs)
