@@ -3,11 +3,10 @@ from PySide6.QtWidgets import (QApplication, QDockWidget, QWidget, QLabel,
                                QStackedWidget, QPushButton, QGroupBox, QFileDialog)
 
 from ToggleWidget import *
-from Collections import *
 from Keybinds import KeybindsPane
-from Songs import *
 from BottomBar import *
 from Settings import Settings
+from panes import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,10 +26,11 @@ class MainWindow(QMainWindow):
         panes_layout = QHBoxLayout()
 
         collections = CollectionsPane()
-        panes_layout.addWidget(collections)
         songs = SongsPane()
-        panes_layout.addWidget(songs)
         keybinds = KeybindsPane()
+
+        panes_layout.addWidget(collections)
+        panes_layout.addWidget(songs)
         panes_layout.addWidget(keybinds)
         
         panes.setLayout(panes_layout)
