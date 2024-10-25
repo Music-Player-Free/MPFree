@@ -1,6 +1,13 @@
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 from db import SongDB
 
+# M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
+# replace 'select * from ?' with 'select (col1, col2)
+# Figure out what to do with id
+    # Load without ID,
+    # query db to instantiate obj with lastRowID
+#implement all tables
+
 class Song(QListWidgetItem):
     '''
     Song object. \n
@@ -21,11 +28,12 @@ class Song(QListWidgetItem):
     def __repr__(self):
         return "Song widget "
 
+
 class Songs(QListWidget):
     '''
     ### TODO
     '''
-    def __init__(self, spacing=5, wrapping=True):
+    def __init__(self, spacing=5, wrapping=False):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
@@ -52,16 +60,23 @@ class Songs(QListWidget):
             item.setText(item.song_name) # items are song objects, python interpreter knows this through the type hinting.
             self.insertItem(idx, item)
 
+
     def loadSongs(self) -> list['Song']:
-        #TODO: replace with loading from DB
-        db = SongDB()
-        loaded = db.read_all()
+        # create list to populate outside scope
         loaded_to_songs = []
-        for result in loaded:
-            instance = Song(path_to_file = result[1], song_name = result[2], track_len = result[3], artist = result[4])
-            loaded_to_songs.append(instance)
+
+        # limit songs
+        # make sure to instantiate with () after SongDB to create an object
+        with SongDB() as sdb:
+            loaded = sdb.read_all()
+
+            for result in loaded:
+                kw = {col: result[i] for i, col in enumerate(sdb.columns)}
+                instance = Song(**kw)
+                loaded_to_songs.append(instance)
 
         return loaded_to_songs
+
 
 
 class SongsPane(QWidget):

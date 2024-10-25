@@ -1,0 +1,25 @@
+To insert into sql the syntax is:
+INSERT INTO _table_ (columns) VALUES (values);
+When using sqlite in python, we use the cursor.execute() method.
+This method takes two arguments:
+    - a string representing the sql query to be executed,
+    - and a list variable representing data to be passed into the sql query
+
+so we could do something like:
+sql_query_as_string = "INSERT INTO songs (path_to_file, album,...etc) VALUES (?, ?, ?, ?)"
+data = ["/workspace1/folder1/balls.mp3", "balls album", ...]
+
+cursor.execut(sql_query_as_string, data)
+
+the use of '?' in the sql string is a convention of Python sqlite3. The execute function will replace any '?'
+with the data you pass in.
+
+Since we might want to adjust the columns (or at least have the ability to do so, forward thinking and that)
+we take the length of columns variable and create a string of '?' characters separated by ", "
+this means if we change songs to have 12 columns, then we only have to update the columns and the (?, ?, ?, ?)
+will be generated dynamically.
+
+String method .join() works on the string literal ", " which is a comma and whitespace
+join takes a list as a parameter and will intersect the string between whatever is in the input list.
+Think of it as an opposite to split, "Here is sample".split(" ") returns ["Here", "is", "sample"]
+and ", ".join(["Here", "is", "sample"]) will return "Here, is, sample" (notice  how it doesn't add to the ends).
