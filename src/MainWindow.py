@@ -6,7 +6,8 @@ from ToggleWidget import *
 from Keybinds import KeybindsPane
 from BottomBar import *
 from Settings import Settings
-from panes import *
+from Collections import *
+from Songs import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,8 +26,9 @@ class MainWindow(QMainWindow):
         panes = QWidget()
         panes_layout = QHBoxLayout()
 
+        collections = CollectionsPane()
         songs = SongsPane()
-        collections = CollectionsPane(songs)
+        collections.collections.set_songs_ref(songs.songs)
         keybinds = KeybindsPane()
 
         panes_layout.addWidget(collections)

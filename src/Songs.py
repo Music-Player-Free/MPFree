@@ -90,11 +90,11 @@ class SongsPane(QWidget):
         label.setText("Songs")
 
         # Create Songs object (extends ListWidget)
-        songs = Songs()
+        self.songs = Songs()
 
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
-        layout.addWidget(songs)
+        layout.addWidget(self.songs)
 
         # Apply layout to instantiated widget (self)
         self.setLayout(layout)
