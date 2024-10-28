@@ -3,11 +3,11 @@ from PySide6.QtWidgets import (QApplication, QDockWidget, QWidget, QLabel,
                                QStackedWidget, QPushButton, QGroupBox, QFileDialog)
 
 from ToggleWidget import *
-from Collections import *
 from Keybinds import KeybindsPane
-from Songs import *
 from BottomBar import *
 from Settings import Settings
+from Collections import *
+from Songs import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,22 +27,22 @@ class MainWindow(QMainWindow):
         panes_layout = QHBoxLayout()
 
         collections = CollectionsPane()
-        panes_layout.addWidget(collections)
         songs = SongsPane()
-        panes_layout.addWidget(songs)
+        collections.collections.set_songs_ref(songs.songs) # Should consider renaming this. First songs is the pane,
+                                                           # second is the real Songs class. Same with collections.collections
         keybinds = KeybindsPane()
-        panes_layout.addWidget(keybinds)
-        
-        panes.setLayout(panes_layout)
 
+        panes_layout.addWidget(collections)
+        panes_layout.addWidget(songs)
+        panes_layout.addWidget(keybinds)
+
+        panes.setLayout(panes_layout)
 
         #create settings window
         settings = Settings()
 
         #add panes and settings to toggleable widget
         stacked = ToggleWidget(panes, settings)
-
-
 
         #create bottom bar
         bottom_bar = BottomBar(stacked)

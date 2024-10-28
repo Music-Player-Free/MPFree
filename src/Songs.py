@@ -1,12 +1,15 @@
+from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 from db import SongDB
 
 # M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
+
 # replace 'select * from ?' with 'select (col1, col2)
 # Figure out what to do with id
-    # Load without ID, 
+    # Load without ID,
     # query db to instantiate obj with lastRowID
 #implement all tables
+
 
 class Song(QListWidgetItem):
     '''
@@ -17,7 +20,7 @@ class Song(QListWidgetItem):
 
     def __init__(self, **kwargs):
         super().__init__()
-        # self.db_id = kwargs['db_id']
+        self.id = kwargs['id']
 
         self.path_to_file = kwargs['path_to_file']
 
@@ -26,14 +29,15 @@ class Song(QListWidgetItem):
         self.track_len = kwargs['track_len']
 
     def __repr__(self):
-        return "Song widget "
+        return "Song widget {}".format(self.id)
 
 
 class Songs(QListWidget):
     '''
-    ### TODO
+    # TODO
+    docstring
     '''
-    def __init__(self, spacing=5, wrapping=True):
+    def __init__(self, spacing=5, wrapping=False):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
@@ -45,9 +49,9 @@ class Songs(QListWidget):
         self.setVisible(True)
 
         # Populate songs
-        self.populate(self.loadSongs())
+        # self.populate(self.load_songs())
 
-
+    @Slot()
     def populate(self, songList: list['Song']):
         '''
         Set text for songs (base class ItemWidgets) and insert into self.
@@ -61,23 +65,17 @@ class Songs(QListWidget):
             self.insertItem(idx, item)
 
 
-    def loadSongs(self) -> list['Song']:
-        # create list to populate outside scope
+    def load_songs(self) -> list['Song']:
         loaded_to_songs = []
 
-
-        # limit songs 
-        # make sure to instantiate with () after SongDB to create an object
         with SongDB() as sdb:
-            loaded = sdb.read_all()
-
-            for result in loaded:
+            for result in sdb.read_all():
                 kw = {col: result[i] for i, col in enumerate(sdb.columns)}
                 instance = Song(**kw)
                 loaded_to_songs.append(instance)
 
         return loaded_to_songs
-    
+
 
 
 class SongsPane(QWidget):
@@ -92,11 +90,11 @@ class SongsPane(QWidget):
         label.setText("Songs")
 
         # Create Songs object (extends ListWidget)
-        songs = Songs()
+        self.songs = Songs()
 
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
-        layout.addWidget(songs)
+        layout.addWidget(self.songs)
 
         # Apply layout to instantiated widget (self)
         self.setLayout(layout)
