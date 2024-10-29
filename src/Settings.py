@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QFileDialog, QPushButton, QVBoxLayout, QWidget
-
+from PySide6.QtWidgets import (QFileDialog, QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QSize)
 
 class Settings(QWidget):
     '''
@@ -9,20 +9,18 @@ class Settings(QWidget):
     '''
     def __init__(self):
         super().__init__()
-        # Using Vertical layout
-        layout = QVBoxLayout()
+        layout = QVBoxLayout()  # Vertical
 
-        # Create button
-        file_button = QPushButton("Import music from folder")
-        file_button.clicked.connect(self.button_file)
+        file_button = QPushButton("Import music from folder") # create button
+        file_button.setFixedSize(QSize(80, 20))
+        file_button.clicked.connect(self.get_user_dir) # connect to slot
         
-        # Add file button to layout
-        layout.addWidget(file_button)
 
-        # Apply layout
-        self.setLayout(layout)
+        layout.addWidget(file_button)  # add to layout
+        self.setLayout(layout)  # apply layout
 
-    def button_file(self, button_text="Choose folder"):
+
+    def get_user_dir(self, clicked, button_text="Choose folder"):
         '''
         ### TODO:
         <li>Might need to put this somewhere else, but for now can stay
@@ -32,5 +30,5 @@ class Settings(QWidget):
         Returns File Dialog window instance
         '''
         dialog = QFileDialog()
-        file = dialog.getExistingDirectory(None, button_text)
-        return file
+        # print(str(dialog.getExistingDirectory(parent=self, caption=button_text)))
+        return str(dialog.getExistingDirectory(self, button_text))
