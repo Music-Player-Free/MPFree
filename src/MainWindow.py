@@ -31,22 +31,23 @@ class MainWindow(QMainWindow):
         collections.collections.set_songs_ref(songs.songs) # Should consider renaming this. First songs is the pane,
                                                            # second is the real Songs class. Same with collections.collections
         keybinds = KeybindsPane()
+        settings = Settings()
+        stacked = ToggleWidget(songs, settings)
 
         panes_layout.addWidget(collections)
-        panes_layout.addWidget(songs)
+        panes_layout.addWidget(stacked)
         panes_layout.addWidget(keybinds)
 
         panes.setLayout(panes_layout)
 
         #create settings window
-        settings = Settings()
 
         #add panes and settings to toggleable widget
-        stacked = ToggleWidget(panes, settings)
 
         #create bottom bar
         bottom_bar = BottomBar(stacked)
 
+
         #add toggleable widget and bottom bar to QVBoxLayout
-        layout.addWidget(stacked)
+        layout.addWidget(panes)
         layout.addWidget(bottom_bar)
