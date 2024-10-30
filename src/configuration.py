@@ -2,7 +2,9 @@ import json
 
 '''
 Usage:
-conf = Configuration.load_json('config.json') v# Configuration isn't instantiated, the methods are static
+conf = Config.load_json('config.json') v# Configuration isn't instantiated, the methods are static
+
+returns a Dict, which is different to dict, in that you can use .notation 
 
 Data (attributes) are accessed through dot . notation 
 conf.version
@@ -46,3 +48,6 @@ class Config(object):
         with open(path, "r") as f:
             result = Config.__load__(json.loads(f.read()))
         return result
+    
+    def __repr__(self):
+        return "Config object: {}".format(self.__dict__["version"])
