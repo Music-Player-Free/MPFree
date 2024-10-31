@@ -151,8 +151,6 @@ class SongDB(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-# INSERT INTO songs VALUES ('file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3','amalgam','100','unknown')
-
 class TagDB(Database, DBInter):
     '''
     Database object for songs table.
