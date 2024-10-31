@@ -1,8 +1,16 @@
 from PySide6.QtWidgets import (QFileDialog, QPushButton, QWidget,
                                QVBoxLayout, QHBoxLayout,
                                QLineEdit, QLabel, QComboBox, QListWidget)
-from PySide6.QtCore import (QSize)
+from PySide6.QtCore import (QSize, QObject,
+                            Slot)
+from PySide6.QtGui import (QValidator, QRegularExpressionValidator)
+
+import regex
+import os
+
 from configuration import Config, Dict
+
+
 
 
 '''
@@ -44,21 +52,22 @@ class Settings(QWidget):
 
         self.setLayout(settings_layout)  # apply layout
 
+class FileLineEdit(QLineEdit):
+    @Slot()
+    def on_text_changed(self, path: str):
+        self.validator().validate(path, 1)
 
 class FilePane(QWidget):
     def __init__(self, file_path: str="Enter file path"):
         super().__init__()
         file_layout = QHBoxLayout()
 
-
-        #TODO
-        # some stuff here, validator, signals like text changed etc
-        # lose focus once enter is pressed
-        file_text = QLineEdit()
-        if not file_path:
-            file_text.setPlaceholderText("Enter file path")
-        else:
-            file_text.setText(file_path)
+        # TODO
+        # maybe change to, or add, text_entered?
+        # display **why** // is not allowed.
+        # lose focus once enter is pressed, or mouse clicked??
+        
+        file_text = self.line_edit(file_path)
         
         file_button = QPushButton("Import music from folder") # create button
         file_button.setFixedSize(QSize(80, 20))
@@ -69,13 +78,32 @@ class FilePane(QWidget):
 
         self.setLayout(file_layout)
 
+    def line_edit(self, path):
+        '''
+        os.path.exists()
+        os.path.isdir()
+        os.path.isfile()
+        '''
+        # match file paths with word characters but NOT // (empty file path)
+        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
+        validator = QRegularExpressionValidator(rex, self)
+
+        edit = FileLineEdit()
+        edit.setValidator(validator)
+        edit.textChanged.connect(edit.on_text_changed)
+
+        if not path:
+            edit.setPlaceholderText("Enter file path")
+        else:
+            edit.setText(path)
+        
+        return edit
+    
+            
+
+    @Slot()
     def get_user_dir(self, clicked, button_text="Choose folder"):
         '''
-        ### TODO:
-        <li>Might need to put this somewhere else, but for now can stay
-        <li>Look into existing directoy for user preference. WIll help when we store stuff eventually.
-        
-
         Returns File Dialog window instance
         '''
         dialog = QFileDialog()
