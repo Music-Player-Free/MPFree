@@ -23,11 +23,12 @@ class ToggleWidget(QStackedWidget):
         self.addWidget(widget1)
         self.addWidget(widget2)
 
+
     def toggle(self):
         '''
         Toggle between two widgets.
         '''
 
         # Counting 1,2,3,4 and taking the remainder mod 2 (% 2),
-        # we get   1,0,1,0.
+        # we get   1,0,1,0
         self.setCurrentIndex((self.currentIndex()+1) % 2)

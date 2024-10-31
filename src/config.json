@@ -1,0 +1,16 @@
+{
+    "version": 1,
+    "userData": {
+      "filePath": "",
+      "themePreference": "dark",
+      "keybinds": {
+        "play": "p",
+        "skip": "shift+n",
+        "left": "h",
+        "down": "j",
+        "up": "k",
+        "right": "l"
+      }    
+    }
+    
+}
