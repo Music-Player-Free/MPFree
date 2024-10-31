@@ -76,7 +76,7 @@ class MediaControls(QWidget):
     def  __init__(self): #TODO: Connect buttons up to slots/methods!!!!
         super().__init__()
         self.is_paused = True
-       # self.current_song = Song()
+        self.current_song: Song = Song()
 
         # ---- Window setup
         # Using Horizontal layout

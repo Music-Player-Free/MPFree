@@ -76,8 +76,6 @@ class Songs(QListWidget):
 
         return loaded_to_songs
 
-#INSERT INTO songs (path_to_file, song_name, track_len, artist) VALUES ('file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3','amalgam','100','unknown')
-
 class SongsPane(QWidget):
     def __init__(self):
         super().__init__()
