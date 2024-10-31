@@ -76,7 +76,7 @@ class Songs(QListWidget):
 
         return loaded_to_songs
 
-
+#INSERT INTO songs (path_to_file, song_name, track_len, artist) VALUES ('file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3','amalgam','100','unknown')
 
 class SongsPane(QWidget):
     def __init__(self):
@@ -92,13 +92,13 @@ class SongsPane(QWidget):
         # Create Songs object (extends ListWidget)
         self.songs = Songs()
 
-        home_button = QPushButton()
-        home_button.setText("Home")
-        home_button.clicked.connect(self.songs.populate(self.songs.load_all_songs()))
+        allsongs_button = QPushButton()
+        allsongs_button.setText("All Songs")
+        allsongs_button.clicked.connect(self.songs.populate(self.songs.load_all_songs()))
 
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
-        layout.addWidget(home_button)
+        layout.addWidget(allsongs_button)
         layout.addWidget(self.songs)
 
 
