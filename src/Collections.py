@@ -10,13 +10,6 @@ from db import CollectionDB, SongDB, Songs_Collections
 # Since a dictionary is used to cache results, the positional and keyword arguments to the function must be hashable.
 # ^^^ this is for functools.cache if we want to use that.
 
-'''
-collection needs a button
-button will load songs into the songs pane
-button needs to show its been clicked
-'''
-
-
 class Collection(QListWidgetItem):
     '''
     For playlists, albums. Extends WidgetItem. <br>
@@ -36,7 +29,7 @@ class Collections(QListWidget): # Displays collections
     def __init__(self):
         super().__init__()
         self.setSpacing(5)
-        self.setWrapping(True)
+        self.setWrapping(False)
         self.songs_ref: Songs # Get a reference to Songs List Widget, given on app startup inside MainWindow.py
 
         self.label = QLabel("Collections")
@@ -75,7 +68,6 @@ class Collections(QListWidget): # Displays collections
         return song_list
 
     def load_collections(self) -> list['Collection']:
-        # Mock list of collection objects
         load = []
         with CollectionDB() as db:
             # Read from DB
@@ -93,13 +85,13 @@ class CollectionsPane(QWidget):
         super().__init__()
         layout = QVBoxLayout()
 
-        # Get collections
+        # Create collections list
         self.collections = Collections()
-        # Set label for widget
+        # Create Label
         label = QLabel()
         label.setText("Collections")
 
-        # Add label and widget to layout
+        # Add label and list widget to layout
         layout.addWidget(label)
         layout.addWidget(self.collections)
 

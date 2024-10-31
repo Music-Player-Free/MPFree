@@ -89,10 +89,10 @@ class DBInter(ABC):
         '''
         cur = cls.con.cursor()
         sql = "INSERT INTO {} ({}) VALUES ({})".format(cls.table,
-                                                       ", ".join(cls.columns[1:]), 
+                                                       ", ".join(cls.columns[1:]),
                                                        ', '.join(['?']*len(cls.columns[1:]))
                                                        )
-        
+
         cur.execute(sql, data)
         cur.close()
         cls.con.commit()
@@ -119,10 +119,10 @@ class DBInter(ABC):
     @abstractmethod
     def read_all(cls: 'Database') -> sqlite3.Cursor:
         cur = cls.con.cursor()
-        sql = "SELECT {} FROM {}".format(", ".join(cls.columns), 
+        sql = "SELECT {} FROM {}".format(", ".join(cls.columns),
                                         cls.table)
         return cur.execute(sql)
-    
+
 
 
 # Songs implementation of database connection
@@ -137,21 +137,21 @@ class SongDB(Database, DBInter):
 
     def create(self, data: list):
         return super().create(data)
-    
+
     def delete(self, id: list[int]):
         return super().delete(id)
-    
+
     def read(self, id: list[int]):
         return super().read(id)
-    
+
     def read_all(self):
         return super().read_all()
-    
+
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-
+# INSERT INTO songs VALUES ('file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3','amalgam','100','unknown')
 
 class TagDB(Database, DBInter):
     '''
@@ -167,16 +167,16 @@ class TagDB(Database, DBInter):
 
     def create(self, data):
         return super().create(data)
-    
+
     def delete(self, id):
         return super().delete(id)
-    
+
     def read(self, id):
         return super().read(id)
-    
+
     def read_all(self):
         return super().read_all()
-    
+
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
@@ -196,13 +196,13 @@ class CollectionDB(Database, DBInter):
 
     def create(self, data):
         return super().create(data)
-    
+
     def delete(self, id):
         return super().delete(id)
-    
+
     def read(self, id):
         return super().read(id)
-    
+
     def read_all(self):
         return super().read_all()
 
@@ -221,7 +221,7 @@ class RelationInter(ABC):
         '''
         cur = self.con.cursor()
 
-        # Create args 
+        # Create args
         assert 0 <= index <= 1
         assert isinstance(id, list)
 
@@ -229,12 +229,12 @@ class RelationInter(ABC):
         args.insert(1, self.table)
 
         sql = "select {} from {} where {} = ?".format(*args)
-        
+
         ans = cur.execute(sql, id)
         return ans
 
 
-class Songs_Tags(Database, RelationInter): 
+class Songs_Tags(Database, RelationInter):
     def __init__(self):
         super().__init__()
 
@@ -243,7 +243,7 @@ class Songs_Tags(Database, RelationInter):
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
-    
+
 
 
 class Songs_Collections(Database, RelationInter):
@@ -255,10 +255,10 @@ class Songs_Collections(Database, RelationInter):
 
     def read(self, index, id):
         return super().read(index, id)
-        
+
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
-    
+
 
 
 class Collections_Tags(Database, DBInter):
@@ -268,6 +268,6 @@ class Collections_Tags(Database, DBInter):
         self.table = "collections_tags"
         self.columns = ["idx", "collections_id", "tags_id"]
 
-        
+
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()

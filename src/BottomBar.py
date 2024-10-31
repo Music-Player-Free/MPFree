@@ -1,7 +1,8 @@
 from PySide6.QtCore import SLOT
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QPushButton
-
+from Songs import Song
 from ToggleWidget import ToggleWidget
+import vlc
 
 class BottomBar(QWidget):
     def __init__(self, ref: 'ToggleWidget'):
@@ -23,6 +24,14 @@ class BottomBar(QWidget):
         self.setLayout(layout)
 
 
+        #try:
+        #    player = vlc.MediaPlayer("file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3")
+        #    player.play()
+        #except:
+        #    print("Song not found")
+
+
+
 
 class NowPlaying(QWidget):
     '''
@@ -32,7 +41,7 @@ class NowPlaying(QWidget):
 
 
     #TODO asf
-    # Should take string as args for label texts 
+    # Should take string as args for label texts
     # Remember last song played and position
     def __init__(self):
         super().__init__()
@@ -54,7 +63,7 @@ class NowPlaying(QWidget):
 
 class MediaControls(QWidget):
     '''
-    ### TODO: 
+    ### TODO:
     <ul>
         <li>Shuffle button to randomize current collection. Should collections remember shuffle preference?</li>
         <li>Skip forward</li>
@@ -64,30 +73,26 @@ class MediaControls(QWidget):
     Media controls widget extending QWidget \n
     Shuffle, play/pause, skip back and forwards.
     '''
-    def  __init__(self):
-        
+    def  __init__(self): #TODO: Connect buttons up to slots/methods!!!!
         super().__init__()
+        self.is_paused = True
+       # self.current_song = Song()
+
+        # ---- Window setup
         # Using Horizontal layout
         layout = QHBoxLayout()
-        
-
-        #TODO: Connect buttons up to slots/methods!!!!
-
         # Instantiate button with text, add to layout template
-        shuffle_button = QPushButton() 
+        shuffle_button = QPushButton()
         shuffle_button.setText("Shuffle")
         layout.addWidget(shuffle_button)
-
         # Instantiate button with text, add to layout template
         prev_button = QPushButton()
         prev_button.setText("Previous")
         layout.addWidget(prev_button)
-
         # Instantiate button with text, add to layout template
         play_button = QPushButton()
         play_button.setText("Play / Pause")
         layout.addWidget(play_button)
-
         # Instantiate button with text, add to layout template
         next_button = QPushButton()
         next_button.setText("Next")
@@ -95,9 +100,19 @@ class MediaControls(QWidget):
 
         # Apply buttons to layout template
         self.setLayout(layout)
+        #--------END window setup
+
+        #---- vlc
+        # start vlc
+        self.vlc_instance = vlc.Instance('--no-xlib')
+        self.player = self.vlc_instance.media_player_new()
+        #----- END vlc
 
     #TODO
     def toggle_play_pause(self):
+        if self.is_paused:
+            media = self.player.media_new(self.current_song.path_to_file)
+            self.player.set_media(media)
         print("toggled")
 
     #TODO
@@ -114,7 +129,7 @@ class MediaControls(QWidget):
 
 
 class PlaybackControls(QWidget):
-    '''    
+    '''
     Playback controls extends QWidget.
     '''
     def __init__(self):
@@ -134,7 +149,7 @@ class PlaybackControls(QWidget):
 
 class SettingsButton(QWidget):
     '''
-    ### TODO: 
+    ### TODO:
     <ul>
         <li>Layout of settings page</li>
         <li>Add appropriate widgets of settings. </li>
@@ -164,4 +179,3 @@ class SettingsButton(QWidget):
 
         # Apply layout
         self.setLayout(layout)
-

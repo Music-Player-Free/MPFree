@@ -1,5 +1,5 @@
 from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QPushButton, QVBoxLayout, QWidget
 from db import SongDB
 
 # M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
@@ -37,19 +37,19 @@ class Songs(QListWidget):
     # TODO
     docstring
     '''
-    def __init__(self, spacing=5, wrapping=False):
+    def __init__(self):
         super().__init__()
 
         # Songs object extends list widget, and given spacing and wrapping properties
-        self.setSpacing(spacing)
-        self.setWrapping(wrapping)
+        self.setSpacing(5)
+        self.setWrapping(False)
 
         # Create label and apply to self
         self.label = QLabel("Songs")
         self.setVisible(True)
 
         # Populate songs
-        # self.populate(self.load_songs())
+        self.populate(self.load_all_songs())
 
     @Slot()
     def populate(self, songList: list['Song']):
@@ -65,7 +65,7 @@ class Songs(QListWidget):
             self.insertItem(idx, item)
 
 
-    def load_songs(self) -> list['Song']:
+    def load_all_songs(self) -> list['Song']:
         loaded_to_songs = []
 
         with SongDB() as sdb:
@@ -92,9 +92,15 @@ class SongsPane(QWidget):
         # Create Songs object (extends ListWidget)
         self.songs = Songs()
 
+        home_button = QPushButton()
+        home_button.setText("Home")
+        home_button.clicked.connect(self.songs.populate(self.songs.load_all_songs()))
+
         # Add widgets to the layout (following (V)ertical box format)
         layout.addWidget(label)
+        layout.addWidget(home_button)
         layout.addWidget(self.songs)
+
 
         # Apply layout to instantiated widget (self)
         self.setLayout(layout)
