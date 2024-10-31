@@ -19,7 +19,6 @@ CREATE TABLE tags
 
 
 
-
 CREATE TABLE collections 
 (
     id INT PRIMARY KEY NOT NULL,
