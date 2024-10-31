@@ -51,11 +51,12 @@ class NowPlaying(QWidget):
         # Create label, set text and add to vertical layout
         song = QLabel()
         song.setText("Song Name")
-        layout.addWidget(song)
 
         # Create label, set text and add to vertical layout
         artist = QLabel()
         artist.setText("Artist")
+        
+        layout.addWidget(song)
         layout.addWidget(artist)
 
         # Apply newly made layout to self(Qwidget that represents now playing area)
@@ -81,6 +82,7 @@ class MediaControls(QWidget):
         # ---- Window setup
         # Using Horizontal layout
         layout = QHBoxLayout()
+<<<<<<< HEAD
         # Instantiate button with text, add to layout template
         shuffle_button = QPushButton()
         shuffle_button.setText("Shuffle")
@@ -94,9 +96,39 @@ class MediaControls(QWidget):
         play_button.setText("Play / Pause")
         layout.addWidget(play_button)
         # Instantiate button with text, add to layout template
+=======
+        
+
+        #TODO: Connect buttons up to slots/methods!!!!
+
+        # Instantiate button with text, 
+        shuffle_button = QPushButton() 
+        shuffle_button.setText("Shuffle")
+
+        # Instantiate button with text
+        prev_button = QPushButton()
+        prev_button.setText("Previous")
+
+        # Instantiate button with text
+        play_button = QPushButton()
+        play_button.setText("Play / Pause")
+
+        # Instantiate button with text
+>>>>>>> origin
         next_button = QPushButton()
         next_button.setText("Next")
+
+        # Create playback widiget
+        playback_widget =  PlaybackControls()
+
+        # Add to layout template
+
+        # add to layout template
+        layout.addWidget(shuffle_button)
+        layout.addWidget(prev_button)
+        layout.addWidget(play_button)
         layout.addWidget(next_button)
+        layout.addWidget(playback_widget)
 
         # Apply buttons to layout template
         self.setLayout(layout)
@@ -124,7 +156,7 @@ class MediaControls(QWidget):
     def previous(self):
         #if current timestamp <2s
         print("previous song loaded")
-        #else:
+        # else:
             #print("song restarted") // set time to 0
 
 
@@ -146,6 +178,7 @@ class PlaybackControls(QWidget):
 
         # apply template to qwidget
         self.setLayout(layout)
+
 
 class SettingsButton(QWidget):
     '''
@@ -170,11 +203,6 @@ class SettingsButton(QWidget):
         button.setText("Settings")
         button.clicked.connect(self.ref.toggle)
 
-        # Create playback widiget
-        playback_widget =  PlaybackControls()
-
-        # Add to layout template
-        layout.addWidget(playback_widget)
         layout.addWidget(button)
 
         # Apply layout
