@@ -9,7 +9,7 @@ import regex
 import os
 
 from configuration import Config, Dict
-
+from constants import JSON_PATH
 
 
 
@@ -28,10 +28,10 @@ class Settings(QWidget):
 
     Extends QWidget.
     '''
-    def __init__(self, json_path: str, spacing=5, wrapping=True):
+    def __init__(self, spacing=5, wrapping=True):
         super().__init__()
 
-        config = Config().load_json(json_path)
+        config = Config().load_json(JSON_PATH)
 
         settings_layout = QVBoxLayout()  # Vertical
 
@@ -39,9 +39,9 @@ class Settings(QWidget):
         settings_label.setText("Settings")
 
         user_data: Dict = config.userData
-        #TODO
-        #input data from config
+
         file_widget = FilePane(user_data.filePath) 
+
         theme_widget = ThemePane()
         keybinds_widget = KeybindsPane()  # or list view?
 
@@ -54,8 +54,20 @@ class Settings(QWidget):
 
 class FileLineEdit(QLineEdit):
     @Slot()
-    def on_text_changed(self, path: str):
-        self.validator().validate(path, 1)
+    def on_text_changed(self, validator: QRegularExpressionValidator):
+        if validator and validator.validate(self.text(), 1):
+            path = self.text()
+            if (os.path.exists(path)
+                and os.path.isdir(path)):
+                
+                # load config
+                conf = Config.load_json(JSON_PATH)
+                conf["userData"]["filePath"] = path
+
+                # write to config
+                Config.save_json(conf, JSON_PATH)
+                
+
 
 class FilePane(QWidget):
     def __init__(self, file_path: str="Enter file path"):
@@ -78,6 +90,7 @@ class FilePane(QWidget):
 
         self.setLayout(file_layout)
 
+
     def line_edit(self, path):
         '''
         os.path.exists()
@@ -86,11 +99,11 @@ class FilePane(QWidget):
         '''
         # match file paths with word characters but NOT // (empty file path)
         rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
-        validator = QRegularExpressionValidator(rex, self)
+        validator = QRegularExpressionValidator(rex, None)
 
         edit = FileLineEdit()
-        edit.setValidator(validator)
-        edit.textChanged.connect(edit.on_text_changed)
+        edit.returnPressed.connect(
+            lambda validator=validator : edit.on_text_changed(validator))
 
         if not path:
             edit.setPlaceholderText("Enter file path")
@@ -98,7 +111,6 @@ class FilePane(QWidget):
             edit.setText(path)
         
         return edit
-    
             
 
     @Slot()
@@ -124,6 +136,7 @@ class ThemePane(QWidget):
         #TODO
         theme_dropdown = QComboBox()
         
+        #TODO
         theme_layout.addWidget(theme_label)
         theme_layout.addWidget(theme_dropdown)
 

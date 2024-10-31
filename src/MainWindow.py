@@ -10,10 +10,9 @@ from Collections import *
 from Songs import *
 
 class MainWindow(QMainWindow):
-    def __init__(self, json_path="src/config.json"):
+    def __init__(self):
         super().__init__()
         self.label = QLabel("MPFree Music Player")
-        self.json_path = json_path
         self.setMainPage()
 
     def setMainPage(self):
@@ -32,7 +31,7 @@ class MainWindow(QMainWindow):
         collections.collections.set_songs_ref(songs.songs) # Should consider renaming this. First songs is the pane,
                                                            # second is the real Songs class. Same with collections.collections
         keybinds = KeybindsPane()
-        settings = Settings(self.json_path)
+        settings = Settings()
         stacked = ToggleWidget(songs, settings)
 
         panes_layout.addWidget(collections)

@@ -49,5 +49,11 @@ class Config(object):
             result = Config.__load__(json.loads(f.read()))
         return result
     
+    @staticmethod
+    def save_json(data: Dict, path: str): 
+        with open(path, 'w') as f:
+            json.dump(data, f)
+    
     def __repr__(self):
         return "Config object: {}".format(self.__dict__["version"])
+    
