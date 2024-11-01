@@ -1,6 +1,8 @@
-from PySide6.QtCore import SLOT
+from PySide6.QtCore import SLOT, Slot
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QPushButton
 from Songs import Song
+from Songs import Songs as Songslist
+import Songs
 from ToggleWidget import ToggleWidget
 import vlc
 
@@ -10,26 +12,18 @@ class BottomBar(QWidget):
         layout = QHBoxLayout()
 
         # Instantiate NowPlaying object
-        now_playing = NowPlaying()
-        layout.addWidget(now_playing)
+        self.now_playing = NowPlaying()
+        layout.addWidget(self.now_playing)
 
         # Instantiate MediaControl object
-        media_controls = MediaControls()
-        layout.addWidget(media_controls)
+        self.media_controls = MediaControls()
+        layout.addWidget(self.media_controls)
 
         # Instantiate SettingsButton object
-        settings_button = SettingsButton(ref)
-        layout.addWidget(settings_button)
+        self.settings_button = SettingsButton(ref)
+        layout.addWidget(self.settings_button)
 
         self.setLayout(layout)
-
-
-        #try:
-        #    player = vlc.MediaPlayer("file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3")
-        #    player.play()
-        #except:
-        #    print("Song not found")
-
 
 
 
@@ -55,7 +49,7 @@ class NowPlaying(QWidget):
         # Create label, set text and add to vertical layout
         artist = QLabel()
         artist.setText("Artist")
-        
+
         layout.addWidget(song)
         layout.addWidget(artist)
 
@@ -77,32 +71,17 @@ class MediaControls(QWidget):
     def  __init__(self): #TODO: Connect buttons up to slots/methods!!!!
         super().__init__()
         self.is_paused = True
-        self.current_song: Song = Song()
+        self.current_song: Song
+        self.songs_ref: Songslist = Songslist()# alias'd class to circumvent import problems
+        self.songs_ref.clicked.connect(self.set_current_song)
 
         # ---- Window setup
         # Using Horizontal layout
         layout = QHBoxLayout()
-<<<<<<< HEAD
-        # Instantiate button with text, add to layout template
-        shuffle_button = QPushButton()
-        shuffle_button.setText("Shuffle")
-        layout.addWidget(shuffle_button)
-        # Instantiate button with text, add to layout template
-        prev_button = QPushButton()
-        prev_button.setText("Previous")
-        layout.addWidget(prev_button)
-        # Instantiate button with text, add to layout template
-        play_button = QPushButton()
-        play_button.setText("Play / Pause")
-        layout.addWidget(play_button)
-        # Instantiate button with text, add to layout template
-=======
-        
-
         #TODO: Connect buttons up to slots/methods!!!!
 
-        # Instantiate button with text, 
-        shuffle_button = QPushButton() 
+        # Instantiate button with text,
+        shuffle_button = QPushButton()
         shuffle_button.setText("Shuffle")
 
         # Instantiate button with text
@@ -112,9 +91,9 @@ class MediaControls(QWidget):
         # Instantiate button with text
         play_button = QPushButton()
         play_button.setText("Play / Pause")
+        play_button.clicked.connect(self.toggle_play_pause)
 
         # Instantiate button with text
->>>>>>> origin
         next_button = QPushButton()
         next_button.setText("Next")
 
@@ -136,15 +115,24 @@ class MediaControls(QWidget):
 
         #---- vlc
         # start vlc
-        self.vlc_instance = vlc.Instance('--no-xlib')
-        self.player = self.vlc_instance.media_player_new()
+        self.player = vlc.MediaPlayer("file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3") # should instantiate empty, but not working atm
+        # self.player.play() THIS WORKS
         #----- END vlc
+
+    @Slot()
+    def set_current_song(self, song: Song):
+        self.current_song = song
+        self.player = vlc.MediaPlayer(self.current_song.path_to_file)
+        print(f"Set current song to {song.song_name}")
+    def set_songs_ref(self,songs: Songslist):# alias'd class
+        self.songs_ref = songs
 
     #TODO
     def toggle_play_pause(self):
         if self.is_paused:
-            media = self.player.media_new(self.current_song.path_to_file)
-            self.player.set_media(media)
+            self.player.play()
+        else:
+            self.player.pause()
         print("toggled")
 
     #TODO

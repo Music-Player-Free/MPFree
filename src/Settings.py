@@ -14,7 +14,7 @@ from constants import JSON_PATH
 
 
 '''
-TODO 
+TODO
 UI clean up, but that's the whole program really.
 file text functionality
 dropdown functionality
@@ -40,13 +40,13 @@ class Settings(QWidget):
 
         user_data: Dict = config.userData
 
-        file_widget = FilePane(user_data.filePath) 
+        file_widget = FilePane(user_data.filePath)
 
         theme_widget = ThemePane()
         keybinds_widget = KeybindsPane()  # or list view?
 
         settings_layout.addWidget(settings_label)
-        settings_layout.addWidget(file_widget)  
+        settings_layout.addWidget(file_widget)
         settings_layout.addWidget(theme_widget)
         settings_layout.addWidget(keybinds_widget)
 
@@ -59,14 +59,14 @@ class FileLineEdit(QLineEdit):
             path = self.text()
             if (os.path.exists(path)
                 and os.path.isdir(path)):
-                
+
                 # load config
                 conf = Config.load_json(JSON_PATH)
                 conf["userData"]["filePath"] = path
 
                 # write to config
                 Config.save_json(conf, JSON_PATH)
-                
+
 
 
 class FilePane(QWidget):
@@ -78,9 +78,9 @@ class FilePane(QWidget):
         # maybe change to, or add, text_entered?
         # display **why** // is not allowed.
         # lose focus once enter is pressed, or mouse clicked??
-        
+
         file_text = self.line_edit(file_path)
-        
+
         file_button = QPushButton("Import music from folder") # create button
         file_button.setFixedSize(QSize(80, 20))
         file_button.clicked.connect(self.get_user_dir) # connect to slot
@@ -98,7 +98,7 @@ class FilePane(QWidget):
         os.path.isfile()
         '''
         # match file paths with word characters but NOT // (empty file path)
-        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
+        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$"
         validator = QRegularExpressionValidator(rex, None)
 
         edit = FileLineEdit()
@@ -109,9 +109,9 @@ class FilePane(QWidget):
             edit.setPlaceholderText("Enter file path")
         else:
             edit.setText(path)
-        
+
         return edit
-            
+
 
     @Slot()
     def get_user_dir(self, clicked, button_text="Choose folder"):
@@ -121,7 +121,7 @@ class FilePane(QWidget):
         dialog = QFileDialog()
         # print(str(dialog.getExistingDirectory(parent=self, caption=button_text)))
         return str(dialog.getExistingDirectory(self, button_text))
-    
+
     def __repr__(self):
         return super().__repr__()
 
@@ -135,7 +135,7 @@ class ThemePane(QWidget):
 
         #TODO
         theme_dropdown = QComboBox()
-        
+
         #TODO
         theme_layout.addWidget(theme_label)
         theme_layout.addWidget(theme_dropdown)
@@ -150,7 +150,7 @@ class KeybindsPane(QListWidget):
         super().__init__()
         keybinds_layout = QVBoxLayout()
 
-        #TODO 
+        #TODO
         # add widgets for keybinds to lists
 
         keybinds_label = QLabel()

@@ -51,6 +51,7 @@ class Songs(QListWidget):
         # Populate songs
         self.populate(self.load_all_songs())
 
+
     @Slot()
     def populate(self, songList: list['Song']):
         '''
