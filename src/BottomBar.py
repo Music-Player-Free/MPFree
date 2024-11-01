@@ -131,6 +131,7 @@ class MediaControls(QWidget):
     def toggle_play_pause(self):
         if self.is_paused:
             self.player.play()
+            self.is_paused = not self.is_paused
         else:
             self.player.pause()
         print("toggled")
