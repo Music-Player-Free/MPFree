@@ -16,7 +16,7 @@ from constants import JSON_PATH
 '''
 TODO 
 UI clean up, but that's the whole program really.
-file text functionality
+f̶i̶l̶e̶ ̶t̶e̶x̶t̶ ̶f̶u̶n̶c̶t̶i̶o̶n̶a̶l̶i̶t̶y̶
 dropdown functionality
 keybinds
 
@@ -38,6 +38,7 @@ class Settings(QWidget):
         settings_label = QLabel()
         settings_label.setText("Settings")
 
+        # this is how the code was given, but it reads unintuitve I think. (gus)
         user_data: Dict = config.userData
 
         file_widget = FilePane(user_data.filePath) 
@@ -53,50 +54,9 @@ class Settings(QWidget):
         self.setLayout(settings_layout)  # apply layout
 
 class FileLineEdit(QLineEdit):
-    @Slot()
-    def on_text_changed(self, validator: QRegularExpressionValidator):
-        if validator and validator.validate(self.text(), 1):
-            path = self.text()
-            if (os.path.exists(path)
-                and os.path.isdir(path)):
-                
-                # load config
-                conf = Config.load_json(JSON_PATH)
-                conf["userData"]["filePath"] = path
 
-                # write to config
-                Config.save_json(conf, JSON_PATH)
-                
-
-
-class FilePane(QWidget):
-    def __init__(self, file_path: str="Enter file path"):
-        super().__init__()
-        file_layout = QHBoxLayout()
-
-        # TODO
-        # maybe change to, or add, text_entered?
-        # display **why** // is not allowed.
-        # lose focus once enter is pressed, or mouse clicked??
-        
-        file_text = self.line_edit(file_path)
-        
-        file_button = QPushButton("Import music from folder") # create button
-        file_button.setFixedSize(QSize(80, 20))
-        file_button.clicked.connect(self.get_user_dir) # connect to slot
-
-        file_layout.addWidget(file_text)
-        file_layout.addWidget(file_button)
-
-        self.setLayout(file_layout)
-
-
-    def line_edit(self, path):
-        '''
-        os.path.exists()
-        os.path.isdir()
-        os.path.isfile()
-        '''
+    @staticmethod
+    def line_edit(path):
         # match file paths with word characters but NOT // (empty file path)
         rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
         validator = QRegularExpressionValidator(rex, None)
@@ -111,19 +71,71 @@ class FilePane(QWidget):
             edit.setText(path)
         
         return edit
-            
 
     @Slot()
-    def get_user_dir(self, clicked, button_text="Choose folder"):
+    def on_text_changed(self, validator: QRegularExpressionValidator):
+        if (validator
+                and validator.validate(self.text(), 1)[0].name == "Acceptable"): # [0] because it returns tuple,
+            path = self.text()                                                   #  .name because its enum
+            if (os.path.exists(path)
+                and os.path.isdir(path)):
+                
+                # load config
+                conf = Config.load_json(JSON_PATH)
+                conf["userData"]["filePath"] = path
+
+                # write to config
+                Config.save_json(conf, JSON_PATH)
+    def __repr__(self):
+        return "FileLineEdit: {}".format(self.text())
+                
+
+
+class FilePane(QWidget):
+    def __init__(self, file_path: str="Enter file path"):
+        super().__init__()
+        file_layout = QHBoxLayout()
+
+        # TODO styling:
+        # display **why** // is not allowed.
+        # lose focus once enter is pressed, or mouse clicked??
+        
+        file_text = FileLineEdit.line_edit(file_path)
+        
+        file_button = QPushButton("Import music from folder") # create button
+        file_button.setFixedSize(QSize(80, 20))
+        file_button.clicked.connect(
+            lambda checked: self.get_user_dir()) # connect to slot
+
+        file_layout.addWidget(file_text)
+        file_layout.addWidget(file_button)
+
+        self.setLayout(file_layout)
+
+
+    @staticmethod
+    def get_user_dir(button_text="Choose folder"):
         '''
         Returns File Dialog window instance
         '''
+        print("Here!")
         dialog = QFileDialog()
-        # print(str(dialog.getExistingDirectory(parent=self, caption=button_text)))
-        return str(dialog.getExistingDirectory(self, button_text))
-    
+        
+        path = str(dialog.getExistingDirectory(caption=button_text))
+
+        # load config
+        conf = Config.load_json(JSON_PATH)
+        conf["userData"]["filePath"] = path
+
+        # write to config
+        Config.save_json(conf, JSON_PATH)
+
+        return
+
     def __repr__(self):
         return super().__repr__()
+
+
 
 class ThemePane(QWidget):
     def __init__(self):

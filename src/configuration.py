@@ -52,7 +52,7 @@ class Config(object):
     @staticmethod
     def save_json(data: Dict, path: str): 
         with open(path, 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=2)
     
     def __repr__(self):
         return "Config object: {}".format(self.__dict__["version"])
