@@ -1,4 +1,5 @@
 from PySide6.QtCore import SLOT, Slot
+
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QPushButton
 from Songs import Song
 from Songs import Songs as Songslist
@@ -24,7 +25,6 @@ class BottomBar(QWidget):
         layout.addWidget(self.settings_button)
 
         self.setLayout(layout)
-
 
 
 class NowPlaying(QWidget):
@@ -73,7 +73,7 @@ class MediaControls(QWidget):
         self.is_paused = True
         self.current_song: Song
         self.songs_ref: Songslist = Songslist()# alias'd class to circumvent import problems
-        self.songs_ref.clicked.connect(self.set_current_song)
+        self.songs_ref.itemClicked.connect(self.set_current_song)
 
         # ---- Window setup
         # Using Horizontal layout
@@ -120,10 +120,13 @@ class MediaControls(QWidget):
         #----- END vlc
 
     @Slot()
-    def set_current_song(self, song: Song):
-        self.current_song = song
-        self.player = vlc.MediaPlayer(self.current_song.path_to_file)
-        print(f"Set current song to {song.song_name}")
+    def set_current_song(self, song: Song): #BUG: CODE NOT BEING ACCESSED
+        try:
+            self.current_song = song
+            self.player = vlc.MediaPlayer(self.current_song.path_to_file)
+            print(f"Set current song to {song.song_name}")
+        except:
+            print("Could not select song")
     def set_songs_ref(self,songs: Songslist):# alias'd class
         self.songs_ref = songs
 
@@ -179,18 +182,18 @@ class SettingsButton(QWidget):
 
     Replace central widgets with settings page.
     '''
-    def __init__(self, ref: 'ToggleWidget'):
+    def __init__(self, toggle_ref: 'ToggleWidget'):
         super().__init__()
         # Create layout template
         layout = QHBoxLayout()
 
         # Better name for this variable?
-        self.ref = ref
+        self.toggle_ref = toggle_ref
 
         # Create, label and connect button
         button = QPushButton()
         button.setText("Settings")
-        button.clicked.connect(self.ref.toggle)
+        button.clicked.connect(self.toggle_ref.toggle)
 
         layout.addWidget(button)
 

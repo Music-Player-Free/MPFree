@@ -65,7 +65,7 @@ class Songs(QListWidget):
             item.setText(item.song_name) # items are song objects, python interpreter knows this through the type hinting.
             self.insertItem(idx, item)
 
-
+    @Slot()
     def load_all_songs(self) -> list['Song']:
         loaded_to_songs = []
 
