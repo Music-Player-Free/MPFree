@@ -121,12 +121,10 @@ class MediaControls(QWidget):
 
     @Slot()
     def set_current_song(self, song: Song): #BUG: CODE NOT BEING ACCESSED
-        try:
-            self.current_song = song
-            self.player = vlc.MediaPlayer(self.current_song.path_to_file)
-            print(f"Set current song to {song.song_name}")
-        except:
-            print("Could not select song")
+        self.current_song = song
+        self.player = vlc.MediaPlayer(self.current_song.path_to_file)
+        print(f"Set current song to {song.song_name}")
+        print("Could not select song")
     def set_songs_ref(self,songs: Songslist):# alias'd class
         self.songs_ref = songs
 
