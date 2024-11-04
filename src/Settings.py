@@ -71,7 +71,8 @@ class FileLineEdit(QLineEdit):
     def on_text_changed(self, validator: QRegularExpressionValidator):
         if (validator
                 and validator.validate(self.text(), 1)[0].name == "Acceptable"): # [0] because it returns tuple,
-            path = self.text()                                                   #  .name because its enum
+                                                                                 #  .name because its enum
+            path = os.path.abspath(self.text())
             if (os.path.exists(path)
                 and os.path.isdir(path)):
                 
@@ -81,6 +82,8 @@ class FileLineEdit(QLineEdit):
 
                 # write to config
                 Config.save_json(conf, JSON_PATH)
+
+                self.setText(path)
     def __repr__(self):
         return "FileLineEdit: {}".format(self.text())
                 
