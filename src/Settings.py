@@ -1,8 +1,7 @@
 from PySide6.QtWidgets import (QFileDialog, QPushButton, QWidget,
                                QVBoxLayout, QHBoxLayout,
                                QLineEdit, QLabel, QComboBox, QListWidget)
-from PySide6.QtCore import (QSize, QObject,
-                            Slot)
+from PySide6.QtCore import (QSize, QObject, Slot)
 from PySide6.QtGui import (QValidator, QRegularExpressionValidator)
 
 import regex
@@ -15,9 +14,8 @@ from constants import JSON_PATH
 
 '''
 TODO 
-UI clean up, but that's the whole program really.
-f̶i̶l̶e̶ ̶t̶e̶x̶t̶ ̶f̶u̶n̶c̶t̶i̶o̶n̶a̶l̶i̶t̶y̶
-dropdown functionality
+UI styling
+theme dropdown functionality
 keybinds
 
 might be good idea to separate the boilerplate stuff into methods of settings...? (later)
@@ -25,25 +23,22 @@ might be good idea to separate the boilerplate stuff into methods of settings...
 class Settings(QWidget):
     '''
     Settings button
-
     Extends QWidget.
     '''
     def __init__(self, spacing=5, wrapping=True):
         super().__init__()
-
-        config = Config().load_json(JSON_PATH)
-
         settings_layout = QVBoxLayout()  # Vertical
 
         settings_label = QLabel()
         settings_label.setText("Settings")
 
-        # this is how the code was given, but it reads unintuitve I think. (gus)
-        user_data: Dict = config.userData
+        # deprecated
+        user_data: Dict = Config.load_json(JSON_PATH).userData
 
         file_widget = FilePane(user_data.filePath) 
 
         theme_widget = ThemePane()
+
         keybinds_widget = KeybindsPane()  # or list view?
 
         settings_layout.addWidget(settings_label)
@@ -89,7 +84,6 @@ class FileLineEdit(QLineEdit):
     def __repr__(self):
         return "FileLineEdit: {}".format(self.text())
                 
-
 
 class FilePane(QWidget):
     def __init__(self, file_path: str="Enter file path"):

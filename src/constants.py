@@ -1,1 +1,1 @@
-JSON_PATH = "src/config.json"
+JSON_PATH = "users/config.json"
