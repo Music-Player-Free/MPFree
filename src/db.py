@@ -2,6 +2,8 @@ import sqlite3
 from abc import ABC, abstractmethod
 # from dataclasses import dataclass
 
+from constants import DB_PATH
+
 '''
 TODO:
 test that all implementations work as needed (scared about tags)
@@ -10,14 +12,14 @@ test that all implementations work as needed (scared about tags)
 class Database:
     # Init class variable path to database file
     # if not present SQLite3 will create file with this name.
-    DB_PATH = "src/mpfree.db"
+    
     def __init__(self):
         self.table = ""
         self.columns = ""
 
         # Init connection to database (con)
         # Init cursor to database
-        self.con = sqlite3.connect(self.DB_PATH)
+        self.con = sqlite3.connect(DB_PATH)
 
         # Create tables if not already existing (error checking using sqlite convention 'IF NOT EXISTS')
         self.create_tables()
@@ -78,7 +80,7 @@ class Database:
         self.con.close()
 
     def __repr__(self):
-        return "Connected to {}".format(self.DB_PATH)
+        return "Connected to {}".format(DB_PATH)
 
 
 class DBInter(ABC):

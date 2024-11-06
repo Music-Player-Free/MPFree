@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import (QFileDialog, QPushButton, QWidget,
                                QVBoxLayout, QHBoxLayout,
                                QLineEdit, QLabel, QComboBox, QListWidget)
-from PySide6.QtCore import (QSize, QObject, Slot)
+from PySide6.QtCore import (QSize, QObject, Slot, Signal)
 from PySide6.QtGui import (QValidator, QRegularExpressionValidator)
-
+from abc import ABC, abstractmethod
 import regex
 import os
 
@@ -15,8 +15,10 @@ from constants import JSON_PATH
 '''
 TODO 
 UI styling
+    refresh icon
 theme dropdown functionality
 keybinds
+
 
 might be good idea to separate the boilerplate stuff into methods of settings...? (later)
 '''
@@ -48,24 +50,26 @@ class Settings(QWidget):
 
         self.setLayout(settings_layout)  # apply layout
 
-class FileLineEdit(QLineEdit):
 
-    @staticmethod
-    def line_edit(path):
+'''FileEdit'''
+# ------------------------------------------------------------------------------------ #
+class FileLineEdit(QLineEdit):
+    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
+
+    def __init__(self, path):
+        super().__init__()
         # match file paths with word characters but NOT // (empty file path)
         rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
         validator = QRegularExpressionValidator(rex, None)
 
-        edit = FileLineEdit()
-        edit.returnPressed.connect(
-            lambda validator=validator : edit.on_text_changed(validator))
+        self.returnPressed.connect(
+            lambda validator=validator : self.on_text_changed(validator))
 
         if not path:
-            edit.setPlaceholderText("Enter file path")
+            self.setPlaceholderText("Enter file path")
         else:
-            edit.setText(path)
-        
-        return edit
+            self.setText(path)
+
 
     @Slot()
     def on_text_changed(self, validator: QRegularExpressionValidator):
@@ -73,45 +77,41 @@ class FileLineEdit(QLineEdit):
                 and validator.validate(self.text(), 1)[0].name == "Acceptable"): # [0] because it returns tuple,
                                                                                  #  .name because its enum
             path = os.path.abspath(self.text())
+            
             if (os.path.exists(path)
-                and os.path.isdir(path)):
+                and os.path.isdir(path)
+                and not path == JSON_PATH):
                 
                 # load config
                 conf = Config.load_json(JSON_PATH)
-                conf["userData"]["filePath"] = path
+                conf["userData"]["filePath"] = path  # Could also do conf.userData.filePath but idk which is more clear
 
                 # write to config
                 Config.save_json(conf, JSON_PATH)
 
                 self.setText(path)
+
+                # Refresh 
+                self.filePathChanged.emit(1)
+
+
     def __repr__(self):
         return "FileLineEdit: {}".format(self.text())
                 
+'''FileButton'''
+# ------------------------------------------------------------------------------------ #
 
-class FilePane(QWidget):
-    def __init__(self, file_path: str="Enter file path"):
-        super().__init__()
-        file_layout = QHBoxLayout()
+class FileDialogButton(QPushButton):
+    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
 
-        # TODO styling:
-        # display **why** // is not allowed.
-        # lose focus once enter is pressed, or mouse clicked??
-        
-        file_text = FileLineEdit.line_edit(file_path)
-        
-        file_button = QPushButton("Import music from folder") # create button
-        file_button.setFixedSize(QSize(80, 20))
-        file_button.clicked.connect(
-            lambda checked: self.get_user_dir()) # connect to slot
-
-        file_layout.addWidget(file_text)
-        file_layout.addWidget(file_button)
-
-        self.setLayout(file_layout)
-
-
-    @staticmethod
-    def get_user_dir(button_text="Choose folder"):
+    def __init__(self):
+        super().__init__("Import music from folder")
+        self.setFixedSize(QSize(80, 20))
+        self.clicked.connect(
+            lambda checked: self.get_user_dir()) # connect to slot, lambda to ignore .clicked param (checked).
+    
+    @Slot()
+    def get_user_dir(self, button_text="Choose folder"):
         '''
         Returns File Dialog window instance
         '''
@@ -127,6 +127,67 @@ class FilePane(QWidget):
         # write to config
         Config.save_json(conf, JSON_PATH)
 
+        self.filePathChanged.emit(1)
+    
+    def __repr__(self):
+        return "FileDialogButton: {}".format()
+
+'''FilePane'''
+# ------------------------------------------------------------------------------------ #
+class FilePane(QWidget):
+
+    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
+
+    def __init__(self, file_path="Enter file path"):
+        super().__init__()
+        file_layout = QHBoxLayout()
+
+        # TODO styling:
+        # display **why** // is not allowed.
+        # lose focus once enter is pressed, or mouse clicked??
+        
+        file_text = FileLineEdit(file_path)
+        file_text.filePathChanged.connect(
+            lambda test: self.refresh())  # Testing
+        
+        file_button = FileDialogButton()
+        file_button.filePathChanged.connect(
+            lambda test: self.refresh())
+
+        refresh_button = QPushButton("QIcon")  # TODO: refresh icon
+        icon_size = (40, 40)  # Replace with refresh icon size
+        refresh_button.setFixedSize(QSize(icon_size[0], icon_size[1]))
+        refresh_button.clicked.connect(
+            lambda checked: self.refresh())
+
+        file_layout.addWidget(file_text)
+        file_layout.addWidget(file_button)
+
+        self.setLayout(file_layout)
+
+    @staticmethod
+    def refresh():
+        # Drop songs, collections, songs_collections, songs_tags, collections_tags
+        # Load from file path
+        # Load into Python
+        print("success!")
+        pass
+                
+    
+
+    def load_from_path(self, folder: str):
+        if not folder:
+            return
+        
+        if os.path.isfile(folder):
+            print(folder)
+            return
+        
+        obj = os.scandir(folder)
+        for entry in obj:
+            self.load_from_path(str(entry.path))
+        
+        obj.close()
         return
 
     def __repr__(self):
