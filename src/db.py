@@ -33,7 +33,7 @@ class Database:
         '''
         cur = self.con.cursor()
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs\n(id INTEGER PRIMARY KEY,\npath_to_file TEXT NOT NULL,\nsong_name TEXT NOT NULL,\ntrack_len INTEGER NOT NULL,\nartist TEXT NOT NULL,\nalbum TEXT NOT NULL)\n\n
+                        CREATE TABLE IF NOT EXISTS songs\n(id INTEGER PRIMARY KEY,\npath_to_file TEXT NOT NULL,\nsong_name TEXT NOT NULL,\ntrack_len INTEGER NOT NULL,\nartist TEXT NOT NULL)\n\n
                         ''')
 
         cur.execute('''
@@ -83,6 +83,8 @@ class Database:
         return "Connected to {}".format(DB_PATH)
 
 
+# ---------------------------------------------------------------------- #
+
 class DBInter(ABC):
     @abstractmethod
     def create(cls: 'Database', data: list) -> None:
@@ -96,8 +98,10 @@ class DBInter(ABC):
                                                        )
         
         cur.execute(sql, data)
+        id = cur.lastrowid
         cur.close()
         cls.con.commit()
+        return id
 
     @abstractmethod
     def delete(cls: 'Database', id: int) -> None:
@@ -136,11 +140,11 @@ class DBInter(ABC):
         return cur.execute(sql)
     
 
-
 # Songs implementation of database connection
 class SongDB(Database, DBInter):
     '''
-    Database object for songs table.
+    Database object for songs table.\n
+    Columns are: id, path_to_file, song_name, track_len, artist
     '''
     def __init__(self):
         super().__init__()
@@ -167,10 +171,10 @@ class SongDB(Database, DBInter):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-
 class TagDB(Database, DBInter):
     '''
-    Database object for songs table.
+    Database object for songs table.\n
+    Columns are: id, name, colour
     '''
     def __init__(self):
         # init database object (create tables, establish connection and cursor)
@@ -200,10 +204,10 @@ class TagDB(Database, DBInter):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-
 class CollectionDB(Database, DBInter):
     '''
-    Database object for songs table.
+    Database object for songs table.\n
+    Columns are: id, name, description, author
     '''
     def __init__(self):
         super().__init__()
@@ -230,28 +234,45 @@ class CollectionDB(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-# ------------------------------------------------------- #
+# ---------------------------------------------------------------------- #
 
 class RelationInter(ABC):
+
     @abstractmethod
-    def read(self: 'Database', index: int, id: list[int]):
+    def create(self: 'Database', data: list[int]):
+        cur = self.con.cursor()
+
+        sql = "insert into {} ({}) values (?, ?)".format(
+                                                    self.table,
+                                                    ", ".join(self.columns[1:])
+                                                    )
+        cur.execute(sql, data)
+        id = cur.lastrowid
+        cur.close()
+        self.con.commit()
+        return id
+
+
+
+    @abstractmethod
+    def read(self: 'Database', columns_index: int, idx: list[int]):
         '''
-        Read from relation table. Index is strictly either 0 or 1. \n
+        Read from relation table. Index for the columns is strictly either 0 or 1. \n
         0/1 maps to the words in table name, <br>
         songs_collections maps 0 to songs and 1 maps to collections.
         '''
         cur = self.con.cursor()
 
         # Create args 
-        assert 0 <= index <= 1
-        assert isinstance(id, list)
+        assert 0 <= columns_index <= 1
+        assert isinstance(idx, list)
 
-        args = [self.columns[1 + ((index + i) % 2)] for i in range(2)] # either [1,2] or [2,1]
+        args = [self.columns[1 + ((columns_index + i) % 2)] for i in range(2)] # either [1,2] or [2,1]
         args.insert(1, self.table)
 
         sql = "select {} from {} where {} = ?".format(*args)
         
-        ans = cur.execute(sql, id)
+        ans = cur.execute(sql, idx)
         return ans
     
     @abstractmethod
@@ -265,32 +286,20 @@ class RelationInter(ABC):
         cur.close()
     
 
-
-
-class Songs_Tags(Database, RelationInter): 
-    def __init__(self):
-        super().__init__()
-
-        self.table = "songs_tags"
-        self.columns = ["idx", "songs_id", "tags_id"]
-
-    def read(self, index, id):
-        return super().read(index, id)
-    
-    def drop(self):
-        return super().drop()
-
-    def __repr__(self):
-        return "{} table ".format(self.table) + super().__repr__()
-    
-
-
 class Songs_Collections(Database, RelationInter):
+
+    '''
+    Relations table for songs to collections.\n
+    Columns are: idx, songs_id, collections_id
+    '''
     def __init__(self):
         super().__init__()
 
         self.table = "songs_collections"
         self.columns = ["idx", "songs_id", "collections_id"]
+
+    def create(self, data):
+        return super().create(data)
 
     def read(self, index, id):
         return super().read(index, id)
@@ -302,13 +311,44 @@ class Songs_Collections(Database, RelationInter):
         return "{} table ".format(self.table) + super().__repr__()
     
 
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+    
+
+class Songs_Tags(Database, RelationInter): 
+    '''
+    Relations table for songs to tags.\n
+    Columns are: idx, songs_id, tags_id
+    '''
+    def __init__(self):
+        super().__init__()
+
+        self.table = "songs_tags"
+        self.columns = ["idx", "songs_id", "tags_id"]
+
+    def create(self, data):
+        return super().create(data)
+
+    def read(self, index, id):
+        return super().read(index, id)
+    
+    def drop(self):
+        return super().drop()
+
 
 class Collections_Tags(Database, RelationInter):
+    '''
+    Relations table for collections to tags.\n
+    Columns are: idx, collections_id, tags_id
+    '''
     def __init__(self):
         super().__init__()
 
         self.table = "collections_tags"
         self.columns = ["idx", "collections_id", "tags_id"]
+
+    def create(self, data):
+        return super().create(data)
 
     def read(self, index, id):
         return super().read(index, id)

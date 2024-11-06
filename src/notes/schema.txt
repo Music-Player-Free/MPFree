@@ -5,8 +5,7 @@ CREATE TABLE songs
     path_to_file TEXT NOT NULL,
     song_name TEXT NOT NULL,
     track_len INTEGER NOT NULL, 
-    artist TEXT NOT NULL,
-    album TEXT NOT NULL
+    artist TEXT NOT NULL
 );
 
 CREATE TABLE tags

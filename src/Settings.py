@@ -6,6 +6,7 @@ from PySide6.QtGui import (QValidator, QRegularExpressionValidator)
 from abc import ABC, abstractmethod
 import regex
 import os
+import vlc
 
 from configuration import Config, Dict
 from constants import JSON_PATH
@@ -19,6 +20,7 @@ UI styling
     refresh icon
 theme dropdown functionality
 keybinds
+DELETE ALBUM FROM SONGS OBJECTS.
 
 
 might be good idea to separate the boilerplate stuff into methods of settings...? (later)
@@ -55,7 +57,7 @@ class Settings(QWidget):
 '''FileEdit'''
 # ------------------------------------------------------------------------------------ #
 class FileLineEdit(QLineEdit):
-    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
+    filePathChanged = Signal(name="filePathChanged")  # No idea if int is correct here.
 
     def __init__(self, path):
         super().__init__()
@@ -93,7 +95,7 @@ class FileLineEdit(QLineEdit):
                 self.setText(path)
 
                 # Refresh 
-                self.filePathChanged.emit(1)
+                self.filePathChanged.emit()
 
 
     def __repr__(self):
@@ -103,7 +105,7 @@ class FileLineEdit(QLineEdit):
 # ------------------------------------------------------------------------------------ #
 
 class FileDialogButton(QPushButton):
-    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
+    filePathChanged = Signal(name="filePathChanged")  # No idea if int is correct here.
 
     def __init__(self):
         super().__init__("Import music from folder")
@@ -128,7 +130,7 @@ class FileDialogButton(QPushButton):
         # write to config
         Config.save_json(conf, JSON_PATH)
 
-        self.filePathChanged.emit(1)
+        self.filePathChanged.emit()
     
     def __repr__(self):
         return "FileDialogButton: {}".format()
@@ -137,7 +139,7 @@ class FileDialogButton(QPushButton):
 # ------------------------------------------------------------------------------------ #
 class FilePane(QWidget):
 
-    filePathChanged = Signal(int, name="filePathChanged")  # No idea if int is correct here.
+    filePathChanged = Signal(name="filePathChanged")  # No idea if int is correct here.
 
     def __init__(self, file_path="Enter file path"):
         super().__init__()
@@ -148,12 +150,10 @@ class FilePane(QWidget):
         # lose focus once enter is pressed, or mouse clicked??
         
         file_text = FileLineEdit(file_path)
-        file_text.filePathChanged.connect(
-            lambda test: self.refresh())  # Testing
+        file_text.filePathChanged.connect(self.refresh)  # Testing
         
         file_button = FileDialogButton()
-        file_button.filePathChanged.connect(
-            lambda test: self.refresh())
+        file_button.filePathChanged.connect(self.refresh)
 
         refresh_button = QPushButton("QIcon")  # TODO: refresh icon
         icon_size = (40, 40)  # Replace with refresh icon size
@@ -187,25 +187,79 @@ class FilePane(QWidget):
         with Collections_Tags() as ct_rel:
             ct_rel.drop()
 
-        
-        
+        conf = Config.load_json(JSON_PATH)
 
+        FilePane.load_from_path(conf.userData.filePath, 0)
+
+
+    '''
+    Media.get_meta(col: int)
+    cols that have useful data: 
+    0 - title
+    1 - artist
+    4 - album
+        All the others I can't see, and since mp3 tags need to be edited at the byte-level,
+        I cba to test anymore <- I did actually investigate but it is too much effort for
+        an already solved problem lol.
+    Media.get_duration()
     
+    '''
+    @staticmethod
+    def load_from_path(file: str, coll_id: int):
+        # Base case
+        if not file:
+            return
+        
+        # If mp3 file
+        if os.path.isfile(file) and file.endswith(".mp3"):
+            song_id = -1  # init id variable. (Python might ignore scope here but oldschool == cool)
+            with SongDB() as sdb:
+                path = file  # dunno if we want absolute path or just the name..?
 
-    def load_from_path(self, folder: str):
-        if not folder:
+                inst = vlc.Instance()
+                media = inst.media_new(file)
+                vlc.Media.parse(media)
+
+
+                meta = {}
+                for i in [0, 1]: # select columns 0, 1 from metadata
+                    ans = vlc.Media.get_meta(media, i)
+                    if not ans:
+                        ans = ""
+                    meta[i] = ans
+
+                track_len = vlc.Media.get_duration(media) // 1000  # Represented in ms
+
+                data = [path, meta[0], track_len, meta[1]]
+                song_id = sdb.create(data)
+            
+            with Songs_Collections() as sc_rel:
+                data = [song_id, coll_id]
+                idx = sc_rel.create(data)  ## don't need idx, but it's there.
+
             return
         
-        if os.path.isfile(folder):
-            print(folder)
-            return
-        
-        obj = os.scandir(folder)
+        # If folder
+        obj = os.scandir(file)
+        coll_id = -1
+        with CollectionDB() as cdb:
+            name = file.split("/")[-1]  # folder name
+            description = ""            # leave blank for now
+            author = ""                 # might deprecate?  <------------------TODO
+
+            data = [name, description, author]
+
+            coll_id = cdb.create(data)  # insert to db
+            
+
         for entry in obj:
-            self.load_from_path(str(entry.path))
+            FilePane.load_from_path(str(entry.path), coll_id)
         
+        # Memory safe (lol)
         obj.close()
         return
+
+
 
     def __repr__(self):
         return super().__repr__()
