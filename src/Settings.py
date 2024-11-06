@@ -9,6 +9,7 @@ import os
 
 from configuration import Config, Dict
 from constants import JSON_PATH
+from db import SongDB, Songs_Collections, Songs_Tags, CollectionDB, Collections_Tags
 
 
 
@@ -167,12 +168,28 @@ class FilePane(QWidget):
 
     @staticmethod
     def refresh():
-        # Drop songs, collections, songs_collections, songs_tags, collections_tags
         # Load from file path
         # Load into Python
         print("success!")
-        pass
-                
+
+        # Drop songs, collections, songs_collections, songs_tags, collections_tags
+
+        # THis is ugly as hell. Maybe we should look into having this instances in a list 
+        # and we can loop through them?
+        with SongDB() as sdb:
+            sdb.drop()
+        with CollectionDB() as cdb:
+            cdb.drop()
+        with Songs_Collections() as sc_rel:
+            sc_rel.drop()
+        with Songs_Tags() as st_rel:
+            st_rel.drop()
+        with Collections_Tags() as ct_rel:
+            ct_rel.drop()
+
+        
+        
+
     
 
     def load_from_path(self, folder: str):
@@ -194,7 +211,8 @@ class FilePane(QWidget):
         return super().__repr__()
 
 
-
+'''Theme Pane'''
+# ------------------------------------------------------------------------------------ #
 class ThemePane(QWidget):
     def __init__(self):
         super().__init__()
@@ -215,6 +233,8 @@ class ThemePane(QWidget):
     def __repr__(self):
         return super().__repr__()
 
+'''Keybinds Pane'''
+# ------------------------------------------------------------------------------------ #
 class KeybindsPane(QListWidget):
     def __init__(self):
         super().__init__()

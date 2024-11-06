@@ -33,27 +33,27 @@ class Database:
         '''
         cur = self.con.cursor()
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs (id INTEGER PRIMARY KEY, path_to_file TEXT NOT NULL, song_name TEXT NOT NULL,track_len INTEGER NOT NULL, artist TEXT NOT NULL,album TEXT NOT NULL)
+                        CREATE TABLE IF NOT EXISTS songs\n(id INTEGER PRIMARY KEY,\npath_to_file TEXT NOT NULL,\nsong_name TEXT NOT NULL,\ntrack_len INTEGER NOT NULL,\nartist TEXT NOT NULL,\nalbum TEXT NOT NULL)\n\n
                         ''')
 
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY_KEY NOT NULL, name TEXT NOT NULL,colour TEXT NOT NULL)
+                        CREATE TABLE IF NOT EXISTS tags\n(id INTEGER PRIMARY KEY NOT NULL,\nname TEXT NOT NULL,\ncolour TEXT NOT NULL)\n\n
                         ''')
 
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS collections  (id INTEGER PRIMARY KEY NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL, author TEXT NOT NULL)
+                        CREATE TABLE IF NOT EXISTS collections\n(id INTEGER PRIMARY KEY NOT NULL,\nname TEXT NOT NULL,\ndescription TEXT NOT NULL,\nauthor TEXT NOT NULL)\n\n
                         ''')
 
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs_tags (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
+                        CREATE TABLE IF NOT EXISTS songs_tags\n(idx INTEGER PRIMARY KEY NOT NULL,\nsongs_id INT NOT NULL,\ntags_id INT NOT NULL,\nFOREIGN KEY(songs_id) REFERENCES songs(id),\nFOREIGN KEY(tags_id) REFERENCES tags(id))\n\n
                         ''')
 
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS songs_collections (idx INTEGER PRIMARY KEY NOT NULL, songs_id INT NOT NULL, collections_id INT NOT NULL, FOREIGN KEY(songs_id) REFERENCES songs(id), FOREIGN KEY(collections_id) REFERENCES songs(id))
+                        CREATE TABLE IF NOT EXISTS songs_collections\n(idx INTEGER PRIMARY KEY NOT NULL,\nsongs_id INT NOT NULL,\ncollections_id INT NOT NULL,\nFOREIGN KEY(songs_id) REFERENCES songs(id),\nFOREIGN KEY(collections_id) REFERENCES songs(id))\n\n
                         ''')
 
         cur.execute('''
-                        CREATE TABLE IF NOT EXISTS collections_tags(idx INTEGER PRIMARY KEY NOT NULL, collections_id INT NOT NULL, tags_id INT NOT NULL, FOREIGN KEY(collections_id) REFERENCES collections(id), FOREIGN KEY(tags_id) REFERENCES tags(id))
+                        CREATE TABLE IF NOT EXISTS collections_tags\n(idx INTEGER PRIMARY KEY NOT NULL,\ncollections_id INT NOT NULL,\ntags_id INT NOT NULL,\nFOREIGN KEY(collections_id) REFERENCES collections(id),\nFOREIGN KEY(tags_id) REFERENCES tags(id))\n\n
                         ''')
         cur.close()
         self.con.commit()
@@ -111,6 +111,16 @@ class DBInter(ABC):
         cls.con.commit()
 
     @abstractmethod
+    def drop(cls: 'Database') -> None:
+        '''
+        Drop table 
+        '''
+        cur = cls.con.cursor()
+        sql = "DROP TABLE {}".format(cls.table)
+        cur.execute(sql)
+        cur.close()
+
+    @abstractmethod
     def read(cls: 'Database', id: list[int]) -> sqlite3.Cursor:
         cur = cls.con.cursor()
         sql = "SELECT {} FROM {} WHERE id IN ({})".format(", ".join(cls.columns),
@@ -143,6 +153,9 @@ class SongDB(Database, DBInter):
     def delete(self, id: list[int]):
         return super().delete(id)
     
+    def drop(self):
+        return super().drop()
+    
     def read(self, id: list[int]):
         return super().read(id)
     
@@ -173,6 +186,9 @@ class TagDB(Database, DBInter):
     def delete(self, id):
         return super().delete(id)
     
+    def drop(self):
+        return super().drop()
+    
     def read(self, id):
         return super().read(id)
     
@@ -201,6 +217,9 @@ class CollectionDB(Database, DBInter):
     
     def delete(self, id):
         return super().delete(id)
+    
+    def drop(self):
+        return super().drop()
     
     def read(self, id):
         return super().read(id)
@@ -234,6 +253,18 @@ class RelationInter(ABC):
         
         ans = cur.execute(sql, id)
         return ans
+    
+    @abstractmethod
+    def drop(cls: 'Database') -> None:
+        '''
+        Drop table 
+        '''
+        cur = cls.con.cursor()
+        sql = "DROP TABLE {}".format(cls.table)
+        cur.execute(sql)
+        cur.close()
+    
+
 
 
 class Songs_Tags(Database, RelationInter): 
@@ -242,6 +273,12 @@ class Songs_Tags(Database, RelationInter):
 
         self.table = "songs_tags"
         self.columns = ["idx", "songs_id", "tags_id"]
+
+    def read(self, index, id):
+        return super().read(index, id)
+    
+    def drop(self):
+        return super().drop()
 
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
@@ -257,19 +294,27 @@ class Songs_Collections(Database, RelationInter):
 
     def read(self, index, id):
         return super().read(index, id)
+    
+    def drop(self):
+        return super().drop()
         
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
     
 
 
-class Collections_Tags(Database, DBInter):
+class Collections_Tags(Database, RelationInter):
     def __init__(self):
         super().__init__()
 
         self.table = "collections_tags"
         self.columns = ["idx", "collections_id", "tags_id"]
 
+    def read(self, index, id):
+        return super().read(index, id)
+    
+    def drop(self):
+        return super().drop()
         
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
