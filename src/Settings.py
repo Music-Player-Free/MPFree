@@ -135,8 +135,8 @@ class FileLineEdit(QLineEdit):
 class FileDialogButton(QPushButton):
     filePathChanged = Signal(name="filePathChanged")  
 
-    def __init__(self):
-        super().__init__("Import music from folder")
+    def __init__(self, button_text: str):
+        super().__init__(button_text)
 
         # Custom signal
 
@@ -145,13 +145,13 @@ class FileDialogButton(QPushButton):
         self.setFixedSize(QSize(button_size[0], button_size[1]))
 
         self.clicked.connect(
-            lambda checked: self.get_user_dir()) # connect to slot, lambda to ignore .clicked param (checked).
+            lambda checked: self.get_user_dir(button_text)) # connect to slot, lambda to ignore .clicked param (checked).
         '''
         If lambda is not used, this will try to pass checked (type: bool) into slot, and python will bitch about it.
         '''
 
     @Slot()
-    def get_user_dir(self, button_text="Choose folder"):
+    def get_user_dir(self, button_text):
         '''
         Open FileDialog, QT sorts out most error checking stuff, so we 
         can just cast to string and use the path as we want.
@@ -202,18 +202,20 @@ class FilePane(QWidget):
         file_text.filePathChanged.connect(
             lambda sig=self.refreshReady: FilePane.refresh(sig))  
         
-        file_button = FileDialogButton()
+        file_button = FileDialogButton("Choose Folder")
         file_button.filePathChanged.connect(
             lambda sig=self.refreshReady: FilePane.refresh(sig))
 
-        refresh_button = QPushButton("QIcon")  # TODO: refresh icon
-        icon_size = (40, 40)  # Replace with refresh icon size
+        refresh_button = QPushButton("Refresh!")  # TODO: refresh icon
+        icon_size = (20, 20)  # Replace with refresh icon size
+
         refresh_button.setFixedSize(QSize(icon_size[0], icon_size[1]))
         refresh_button.clicked.connect(
             lambda checked, sig=self.refreshReady: FilePane.refresh(sig))
 
         file_layout.addWidget(file_text)
         file_layout.addWidget(file_button)
+        file_layout.addWidget(refresh_button)
 
         self.setLayout(file_layout)
 
@@ -301,28 +303,31 @@ class FilePane(QWidget):
             return 
         
         # If folder
-        obj = os.scandir(file) # Return iterator of all files in folder
-        
-        with CollectionDB() as cdb:
-            name = file.split("/")[-1]  # folder name
-            description = ""            # leave blank for now
-            author = ""                 # might deprecate?  <------------------TODO
-
-            # create list of data to create
-            data = [name, description, author]
-
-            colls.append(cdb.create(data))  # insert to db
-            # coll_id now has the most recent collection, to pass into each of the file creations.
+        if os.path.isdir(file):
+            obj = os.scandir(file) # Return iterator of all files in folder
             
-        # Iterate through files from scandir obj
-        for entry in obj:
-            FilePane.load_from_path(str(entry.path), colls)
+            with CollectionDB() as cdb:
+                
+                name = file.split("/")[-1] if colls else "All Songs"
+                description = ""            # leave blank for now
+                author = ""                 # might deprecate?  <------------------TODO
 
-        colls.pop()
+                # create list of data to create
+                data = [name, description, author]
 
-        # Memory safe (lol)
-        obj.close()
-        return 
+                colls.append(cdb.create(data))  # insert to db
+                # coll_id now has the most recent collection, to pass into each of the file creations.
+                
+            # Iterate through files from scandir obj
+            for entry in obj:
+                FilePane.load_from_path(str(entry.path), colls)
+
+            colls.pop()
+
+            # Memory safe (lol)
+            obj.close()
+            return 
+        return
 
     def __repr__(self):
         return super().__repr__()
