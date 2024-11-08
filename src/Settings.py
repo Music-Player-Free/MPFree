@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (QFileDialog, QPushButton, QWidget,
                                QVBoxLayout, QHBoxLayout,
                                QLineEdit, QLabel, QComboBox, QListWidget)
-from PySide6.QtCore import (QSize, QObject, Slot, Signal)
+from PySide6.QtCore import (QSize, QObject, Slot, Signal, SignalInstance)
 from PySide6.QtGui import (QValidator, QRegularExpressionValidator)
 from abc import ABC, abstractmethod
 import regex
@@ -42,19 +42,19 @@ class Settings(QWidget):
         conf: Dict = Config.load_json(JSON_PATH)
 
         # Create file widget 
-        file_widget = FilePane(conf.userData.filePath) 
+        self.file_widget = FilePane(conf.userData.filePath) 
 
         # Theme widget
-        theme_widget = ThemePane()
+        self.theme_widget = ThemePane()
 
         # Keybinds widget
-        keybinds_widget = KeybindsPane()  # or list view?
+        self.keybinds_widget = KeybindsPane()  # or list view?
 
         # add widgets to layout
         settings_layout.addWidget(settings_label)
-        settings_layout.addWidget(file_widget)  
-        settings_layout.addWidget(theme_widget)
-        settings_layout.addWidget(keybinds_widget)
+        settings_layout.addWidget(self.file_widget)  
+        settings_layout.addWidget(self.theme_widget)
+        settings_layout.addWidget(self.keybinds_widget)
 
         self.setLayout(settings_layout)  # apply layout
 
@@ -186,7 +186,9 @@ class FilePane(QWidget):
     This is leftover from testing. To make things a bit easier we could pass this
     into the init functions of FileLineEdit and FileDialogButton?
     '''
-    filePathChanged = Signal(name="filePathChanged")  
+    # filePathChanged = Signal(name="filePathChanged")  
+    refreshReady = Signal(name="refreshReady")
+
 
     def __init__(self, file_path="Enter file path"):
         super().__init__()
@@ -197,16 +199,18 @@ class FilePane(QWidget):
         # lose focus once enter is pressed, or mouse clicked??
         
         file_text = FileLineEdit(file_path)
-        file_text.filePathChanged.connect(self.refresh)  # Testing
+        file_text.filePathChanged.connect(
+            lambda sig=self.refreshReady: FilePane.refresh(sig))  
         
         file_button = FileDialogButton()
-        file_button.filePathChanged.connect(self.refresh)
+        file_button.filePathChanged.connect(
+            lambda sig=self.refreshReady: FilePane.refresh(sig))
 
         refresh_button = QPushButton("QIcon")  # TODO: refresh icon
         icon_size = (40, 40)  # Replace with refresh icon size
         refresh_button.setFixedSize(QSize(icon_size[0], icon_size[1]))
         refresh_button.clicked.connect(
-            lambda checked: self.refresh())
+            lambda checked, sig=self.refreshReady: FilePane.refresh(sig))
 
         file_layout.addWidget(file_text)
         file_layout.addWidget(file_button)
@@ -214,7 +218,7 @@ class FilePane(QWidget):
         self.setLayout(file_layout)
 
     @staticmethod
-    def refresh():
+    def refresh(signal: SignalInstance):
 
         # Drop songs, collections, songs_collections, songs_tags, collections_tags
 
@@ -237,15 +241,12 @@ class FilePane(QWidget):
 
         # Access static method (no instance required)
         FilePane.load_from_path(conf.userData.filePath, [])
+        
+        signal.emit()
 
 
     @staticmethod
     def load_from_path(file: str, colls: list[int]):
-        # Base case
-        if not file:
-            return
-        print(colls)
-        
         # If mp3 file
         if os.path.isfile(file) and file.endswith(".mp3"):
             song_id = -1  # init id variable. (Python might ignore scope here but oldschool == cool)
@@ -316,12 +317,12 @@ class FilePane(QWidget):
         # Iterate through files from scandir obj
         for entry in obj:
             FilePane.load_from_path(str(entry.path), colls)
+
         colls.pop()
+
         # Memory safe (lol)
         obj.close()
         return 
-
-
 
     def __repr__(self):
         return super().__repr__()
