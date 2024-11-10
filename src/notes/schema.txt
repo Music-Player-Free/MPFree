@@ -10,7 +10,7 @@ CREATE TABLE songs
 
 CREATE TABLE tags
 (
-    id INT PRIMARY_KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
 
     name TEXT NOT NULL,
     colour TEXT NOT NULL
@@ -21,7 +21,7 @@ CREATE TABLE tags
 
 CREATE TABLE collections 
 (
-    id INT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     #TODO
     name TEXT NOT NULL,
     description TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE collections
 
 CREATE TABLE songs_tags
 (
-    idx INT PRIMARY KEY NOT NULL,
+    idx INTEGER PRIMARY KEY NOT NULL,
 
     songs_id INT NOT NULL,
     tags_id INT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE songs_tags
 
 CREATE TABLE songs_collections 
 (
-    idx INT PRIMARY KEY NOT NULL,
+    idx INTEGER PRIMARY KEY NOT NULL,
     
     songs_id INT NOT NULL,
     collections_id INT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE songs_collections
 
 CREATE TABLE collections_tags
 (
-    idx INT PRIMARY KEY NOT NULL,
+    idx INTEGER PRIMARY KEY NOT NULL,
     
     collections_id INT NOT NULL,
     tags_id INT NOT NULL,
@@ -68,7 +68,17 @@ CREATE TABLE collections_tags
     FOREIGN KEY(tags_id) REFERENCES tags(id)
 );
 
-;
+CREATE TABLE listening_history
+(
+    idx INTEGER PRIMARY KEY NOT NULL,
+    
+    name TEXT NOT NULL,
+    songs_id INT NOT NULL,
+    time_stamp DATETIME NOT NULL,
+    listen_duration INT NOT NULL,
+
+    FOREIGN KEY(songs_id) REFERENCES songs(id)
+);
 
 select * from songs where id in (select songs_id from songs_collections where collections_id = 1);
 
