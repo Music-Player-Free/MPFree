@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
         #create bottom bar
         bottom_bar = BottomBar(stacked)
         bottom_bar.media_controls.set_songs_ref(songs.songs)
+        songs.songs.itemClicked.connect(bottom_bar.media_controls.set_current_song)
 
         #add toggleable widget and bottom bar to QVBoxLayout
         layout.addWidget(panes)
