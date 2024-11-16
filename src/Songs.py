@@ -1,14 +1,9 @@
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtCore import (Slot, QSize)
+from PySide6.QtWidgets import (QLabel, QWidget, 
+                               QListWidget, QListWidgetItem,
+                               QVBoxLayout, QHBoxLayout)
+
 from db import SongDB
-
-# M̶o̶v̶e̶ ̶g̶e̶n̶e̶r̶a̶t̶e̶k̶w̶a̶r̶g̶s̶ ̶s̶o̶m̶e̶w̶h̶e̶r̶e̶ // removed completely, use dict comp from now on, will specify in main.py
-
-# replace 'select * from ?' with 'select (col1, col2)
-# Figure out what to do with id
-    # Load without ID,
-    # query db to instantiate obj with lastRowID
-#implement all tables
 
 
 class Song(QListWidgetItem):
@@ -76,7 +71,8 @@ class Songs(QListWidget):
 
         return loaded_to_songs
 
-
+class SongsMeatball(Songs):
+    pass
 
 class SongsPane(QWidget):
     def __init__(self):
