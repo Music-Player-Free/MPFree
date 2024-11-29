@@ -113,12 +113,13 @@ class MediaControls(QWidget):
 
         #---- vlc
         # start vlc
-        self.player = vlc.MediaPlayer("file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3") # should instantiate empty, but not working atm
+        # Load app with an example song. Should change this to be last played song
+        self.player = vlc.MediaPlayer("file:////home/kyle/Documents/Projects/MPFree/audio/amalgam.mp3")
         # self.player.play() THIS WORKS
         #----- END vlc
 
     @Slot()
-    def set_current_song(self, song: Song): #BUG: CODE NOT BEING ACCESSED
+    def set_current_song(self, song: Song):
         self.current_song = song
         self.player = vlc.MediaPlayer(self.current_song.path_to_file)
         print(f"Set current song to {song.song_name}, {song.path_to_file}")

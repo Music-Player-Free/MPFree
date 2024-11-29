@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         keybinds = KeybindsPane()
         settings = Settings()
         settings.file_widget.refreshReady.connect(
-            lambda : songs.songs.populate(songs.songs.load_songs()))
+            lambda : songs.songs.populate(songs.songs.load_all_songs()))
         settings.file_widget.refreshReady.connect(
             lambda : collections.collections.populate(collections.collections.load_collections()))
 
