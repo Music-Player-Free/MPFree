@@ -73,12 +73,10 @@ class MediaControls(QWidget):
         self.is_paused = True
         self.current_song: Song
         self.songs_ref: Songslist = Songslist()# alias'd class to circumvent import problems
-        #self.songs_ref.itemClicked.connect(self.set_current_song)
 
         # ---- Window setup
         # Using Horizontal layout
         layout = QHBoxLayout()
-        #TODO: Connect buttons up to slots/methods!!!!
 
         # Instantiate button with text,
         shuffle_button = QPushButton()
@@ -123,7 +121,7 @@ class MediaControls(QWidget):
     def set_current_song(self, song: Song): #BUG: CODE NOT BEING ACCESSED
         self.current_song = song
         self.player = vlc.MediaPlayer(self.current_song.path_to_file)
-        print(f"Set current song to {song.song_name}")
+        print(f"Set current song to {song.song_name}, {song.path_to_file}")
     def set_songs_ref(self,songs: Songslist):# alias'd class
         self.songs_ref = songs
 
