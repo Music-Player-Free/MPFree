@@ -130,6 +130,10 @@ ENV/
 env.bak/
 venv.bak/
 
+
+# User files
+/users/config.json
+
 # # SQLite stuff
 # schema.txt
 .DS_Store

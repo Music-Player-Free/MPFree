@@ -32,6 +32,11 @@ class MainWindow(QMainWindow):
                                                            # second is the real Songs class. Same with collections.collections
         keybinds = KeybindsPane()
         settings = Settings()
+        settings.file_widget.refreshReady.connect(
+            lambda : songs.songs.populate(songs.songs.load_songs()))
+        settings.file_widget.refreshReady.connect(
+            lambda : collections.collections.populate(collections.collections.load_collections()))
+
         stacked = ToggleWidget(songs, settings)
 
         panes_layout.addWidget(collections)
