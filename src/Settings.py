@@ -21,7 +21,7 @@ UI clean up, but that's the whole program really.
 file text functionality
 dropdown functionality
 =======
-TODO 
+TODO
 UI styling
     refresh icon
 theme dropdown functionality
@@ -45,15 +45,11 @@ class Settings(QWidget):
         settings_label = QLabel()
         settings_label.setText("Settings")
 
-
-<<<<<<< HEAD
-        file_widget = FilePane(user_data.filePath)
-=======
+        #TODO: if no file, create a file
         conf: Dict = Config.load_json(JSON_PATH)
->>>>>>> angus
 
-        # Create file widget 
-        self.file_widget = FilePane(conf.userData.filePath) 
+        # Create file widget
+        self.file_widget = FilePane(conf.userData.filePath)
 
         # Theme widget
         self.theme_widget = ThemePane()
@@ -63,15 +59,9 @@ class Settings(QWidget):
 
         # add widgets to layout
         settings_layout.addWidget(settings_label)
-<<<<<<< HEAD
-        settings_layout.addWidget(file_widget)
-        settings_layout.addWidget(theme_widget)
-        settings_layout.addWidget(keybinds_widget)
-=======
-        settings_layout.addWidget(self.file_widget)  
+        settings_layout.addWidget(self.file_widget)
         settings_layout.addWidget(self.theme_widget)
         settings_layout.addWidget(self.keybinds_widget)
->>>>>>> angus
 
         self.setLayout(settings_layout)  # apply layout
 
@@ -89,7 +79,7 @@ class FileLineEdit(QLineEdit):
         super().__init__()  # Init LineEdit
 
         # match file paths with word characters but NOT "//" (empty file path)
-        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$" 
+        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$"
 
 
         # Init validator obj. Uses params: regex, parent
@@ -101,9 +91,9 @@ class FileLineEdit(QLineEdit):
 
         # Lambda function to pass argument correctly.
         # Without lambda, this would call the validator on init, however we can use
-        # named argument (kw) 
+        # named argument (kw)
         self.returnPressed.connect(
-            lambda validator=validator : self.on_text_changed(validator)) 
+            lambda validator=validator : self.on_text_changed(validator))
 
         # Set placeholder text OR user path.
         if not path:
@@ -115,25 +105,20 @@ class FileLineEdit(QLineEdit):
     @Slot()
     def on_text_changed(self, validator: QRegularExpressionValidator):
         '''
-        Slot to validate user file input. 
+        Slot to validate user file input.
         '''
         if (validator
             and validator.validate(self.text(), 1)[0].name == "Acceptable"):  # [0] because it returns tuple,
                                                                               #  .name because its enum
             # Allows user to just type "audio" or "src" (in our case) and OS will append the base path (Home/users/...)
             path = os.path.abspath(self.text())
-            
+
             # If path exists, and is path, and is a NEW path
             # This defines the function to be only on CHANGED path name
             if (os.path.exists(path)
-<<<<<<< HEAD
-                and os.path.isdir(path)):
-
-=======
                 and os.path.isdir(path)
                 and not path == JSON_PATH):
-                
->>>>>>> angus
+
                 # load config
                 conf = Config.load_json(JSON_PATH)
                 conf["userData"]["filePath"] = path  # Could also do conf.userData.filePath but idk which is more clear
@@ -141,24 +126,21 @@ class FileLineEdit(QLineEdit):
                 # write to config
                 Config.save_json(conf, JSON_PATH)
 
-<<<<<<< HEAD
-=======
                 # Update text with new file path
                 self.setText(path)
 
-                # Emit path changed signal. This will be connected to the refresh slot somewhere else. 
+                # Emit path changed signal. This will be connected to the refresh slot somewhere else.
                 self.filePathChanged.emit()
 
 
     def __repr__(self):
         return "FileLineEdit: {}".format(self.text())
-                
+
 '''FileButton'''
 # ------------------------------------------------------------------------------------ #
->>>>>>> angus
 
 class FileDialogButton(QPushButton):
-    filePathChanged = Signal(name="filePathChanged")  
+    filePathChanged = Signal(name="filePathChanged")
 
     def __init__(self, button_text: str):
         super().__init__(button_text)
@@ -178,7 +160,7 @@ class FileDialogButton(QPushButton):
     @Slot()
     def get_user_dir(self, button_text):
         '''
-        Open FileDialog, QT sorts out most error checking stuff, so we 
+        Open FileDialog, QT sorts out most error checking stuff, so we
         can just cast to string and use the path as we want.
 
         No need to check if exists as users have to pick A folder at least.
@@ -187,7 +169,7 @@ class FileDialogButton(QPushButton):
 
         # init dialog
         dialog = QFileDialog()
-        
+
         # cast to string for in-house use
         path = str(dialog.getExistingDirectory(caption=button_text))
 
@@ -200,7 +182,7 @@ class FileDialogButton(QPushButton):
 
         # emit signal on successful change
         self.filePathChanged.emit()
-    
+
     def __repr__(self):
         return "FileDialogButton: {}".format()
 
@@ -211,7 +193,7 @@ class FilePane(QWidget):
     This is leftover from testing. To make things a bit easier we could pass this
     into the init functions of FileLineEdit and FileDialogButton?
     '''
-    # filePathChanged = Signal(name="filePathChanged")  
+    # filePathChanged = Signal(name="filePathChanged")
     refreshReady = Signal(name="refreshReady")
 
 
@@ -222,19 +204,11 @@ class FilePane(QWidget):
         # TODO styling:
         # display **why** // is not allowed.
         # lose focus once enter is pressed, or mouse clicked??
-<<<<<<< HEAD
 
-        file_text = self.line_edit(file_path)
-
-        file_button = QPushButton("Import music from folder") # create button
-        file_button.setFixedSize(QSize(80, 20))
-        file_button.clicked.connect(self.get_user_dir) # connect to slot
-=======
-        
         file_text = FileLineEdit(file_path)
         file_text.filePathChanged.connect(
-            lambda sig=self.refreshReady: FilePane.refresh(sig))  
-        
+            lambda sig=self.refreshReady: FilePane.refresh(sig))
+
         file_button = FileDialogButton("Choose Folder")
         file_button.filePathChanged.connect(
             lambda sig=self.refreshReady: FilePane.refresh(sig))
@@ -245,7 +219,6 @@ class FilePane(QWidget):
         refresh_button.setFixedSize(QSize(icon_size[0], icon_size[1]))
         refresh_button.clicked.connect(
             lambda checked, sig=self.refreshReady: FilePane.refresh(sig))
->>>>>>> angus
 
         file_layout.addWidget(file_text)
         file_layout.addWidget(file_button)
@@ -256,21 +229,9 @@ class FilePane(QWidget):
     @staticmethod
     def refresh(signal: SignalInstance):
 
-<<<<<<< HEAD
-    def line_edit(self, path):
-        '''
-        os.path.exists()
-        os.path.isdir()
-        os.path.isfile()
-        '''
-        # match file paths with word characters but NOT // (empty file path)
-        rex = "^[\\w]+(?:\\/[a-zA-Z0-9]+)*\\/?$"
-        validator = QRegularExpressionValidator(rex, None)
-=======
         # Drop songs, collections, songs_collections, songs_tags, collections_tags
->>>>>>> angus
 
-        # THis is ugly as hell. Maybe we should look into having this instances in a list 
+        # THis is ugly as hell. Maybe we should look into having this instances in a list
         # and we can loop through them?
         # Might have to do some factory stuff. Premature optimisation !!!!!!
         with SongDB() as sdb:
@@ -284,31 +245,13 @@ class FilePane(QWidget):
         with Collections_Tags() as ct_rel:
             ct_rel.drop()
 
-<<<<<<< HEAD
-        if not path:
-            edit.setPlaceholderText("Enter file path")
-        else:
-            edit.setText(path)
 
-        return edit
-
-
-    @Slot()
-    def get_user_dir(self, clicked, button_text="Choose folder"):
-        '''
-        Returns File Dialog window instance
-        '''
-        dialog = QFileDialog()
-        # print(str(dialog.getExistingDirectory(parent=self, caption=button_text)))
-        return str(dialog.getExistingDirectory(self, button_text))
-
-=======
         # Get user config settings
         conf = Config.load_json(JSON_PATH)
 
         # Access static method (no instance required)
         FilePane.load_from_path(conf.userData.filePath, [])
-        
+
         signal.emit()
 
 
@@ -317,7 +260,7 @@ class FilePane(QWidget):
         # If mp3 file
         if os.path.isfile(file) and file.endswith(".mp3"):
             song_id = -1  # init id variable. (Python might ignore scope here but oldschool == cool)
-            
+
             with SongDB() as sdb:
                 path = file  # dunno if we want absolute path or just the name..?
 
@@ -326,7 +269,7 @@ class FilePane(QWidget):
                 VLC is all through cpython, and this obscures what instances have variables.##
                 You CAN totally do . methods, i.e. instance.method(parameters)
                 HOWEVER python cannot SEE these and they will be whited out, with no intellisense
-                THEREFORE we can static methods i.e. vlc.class.method(instance, parameters) 
+                THEREFORE we can static methods i.e. vlc.class.method(instance, parameters)
                 WHICH WILL detect what the function does and give type hints etc.
                 '''
                 inst = vlc.Instance()
@@ -335,7 +278,7 @@ class FilePane(QWidget):
 
                 '''
                 Media.get_meta(col: int)
-                cols that have useful data: 
+                cols that have useful data:
                 0 - title
                 1 - artist
                 4 - album
@@ -358,21 +301,21 @@ class FilePane(QWidget):
 
                 # Insert into DB
                 song_id = sdb.create(data)
-            
+
             with Songs_Collections() as sc_rel:
                 for coll_id in colls:
                 # Song Relations only uses two columns
                     data = [song_id, coll_id]
                     idx = sc_rel.create(data)  ## don't need idx as of 7.11.24, but create returns it.
 
-            return 
-        
+            return
+
         # If folder
         if os.path.isdir(file):
             obj = os.scandir(file) # Return iterator of all files in folder
-            
+
             with CollectionDB() as cdb:
-                
+
                 name = file.split("/")[-1] if colls else "All Songs"
                 description = ""            # leave blank for now
                 author = ""                 # might deprecate?  <------------------TODO
@@ -382,7 +325,7 @@ class FilePane(QWidget):
 
                 colls.append(cdb.create(data))  # insert to db
                 # coll_id now has the most recent collection, to pass into each of the file creations.
-                
+
             # Iterate through files from scandir obj
             for entry in obj:
                 FilePane.load_from_path(str(entry.path), colls)
@@ -391,10 +334,9 @@ class FilePane(QWidget):
 
             # Memory safe (lol)
             obj.close()
-            return 
+            return
         return
 
->>>>>>> angus
     def __repr__(self):
         return super().__repr__()
 

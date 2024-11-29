@@ -1,7 +1,7 @@
 from PySide6.QtCore import (Slot, QSize)
 from PySide6.QtWidgets import (QLabel, QWidget,
                                QListWidget, QListWidgetItem,
-                               QVBoxLayout, QHBoxLayout)
+                               QVBoxLayout, QHBoxLayout, QPushButton)
 
 from db import SongDB
 
