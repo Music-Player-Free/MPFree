@@ -12,7 +12,7 @@ test that all implementations work as needed (scared about tags)
 class Database:
     # Init class variable path to database file
     # if not present SQLite3 will create file with this name.
-    
+
     def __init__(self):
         self.table = ""
         self.columns = ""
@@ -117,7 +117,7 @@ class DBInter(ABC):
     @abstractmethod
     def drop(cls: 'Database') -> None:
         '''
-        Drop table 
+        Drop table
         '''
         cur = cls.con.cursor()
         sql = "DROP TABLE {}".format(cls.table)
@@ -156,14 +156,10 @@ class SongDB(Database, DBInter):
 
     def delete(self, id: list[int]):
         return super().delete(id)
-<<<<<<< HEAD
 
-=======
-    
     def drop(self):
         return super().drop()
-    
->>>>>>> angus
+
     def read(self, id: list[int]):
         return super().read(id)
 
@@ -174,10 +170,6 @@ class SongDB(Database, DBInter):
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
-<<<<<<< HEAD
-=======
-
->>>>>>> angus
 class TagDB(Database, DBInter):
     '''
     Database object for songs table.\n
@@ -196,14 +188,10 @@ class TagDB(Database, DBInter):
 
     def delete(self, id):
         return super().delete(id)
-<<<<<<< HEAD
 
-=======
-    
     def drop(self):
         return super().drop()
-    
->>>>>>> angus
+
     def read(self, id):
         return super().read(id)
 
@@ -232,14 +220,10 @@ class CollectionDB(Database, DBInter):
 
     def delete(self, id):
         return super().delete(id)
-<<<<<<< HEAD
 
-=======
-    
     def drop(self):
         return super().drop()
-    
->>>>>>> angus
+
     def read(self, id):
         return super().read(id)
 
@@ -267,8 +251,6 @@ class RelationInter(ABC):
         self.con.commit()
         return id
 
-
-
     @abstractmethod
     def read(self: 'Database', columns_index: int, idx: list[int]):
         '''
@@ -278,52 +260,27 @@ class RelationInter(ABC):
         '''
         cur = self.con.cursor()
 
-<<<<<<< HEAD
         # Create args
-        assert 0 <= index <= 1
-        assert isinstance(id, list)
-=======
-        # Create args 
         assert 0 <= columns_index <= 1
         assert isinstance(idx, list)
->>>>>>> angus
 
         args = [self.columns[1 + ((columns_index + i) % 2)] for i in range(2)] # either [1,2] or [2,1]
         args.insert(1, self.table)
 
         sql = "select {} from {} where {} = ?".format(*args)
-<<<<<<< HEAD
 
-        ans = cur.execute(sql, id)
-        return ans
-
-
-class Songs_Tags(Database, RelationInter):
-    def __init__(self):
-        super().__init__()
-
-        self.table = "songs_tags"
-        self.columns = ["idx", "songs_id", "tags_id"]
-
-    def __repr__(self):
-        return "{} table ".format(self.table) + super().__repr__()
-
-=======
-        
         ans = cur.execute(sql, idx)
         return ans
-    
+
     @abstractmethod
     def drop(cls: 'Database') -> None:
         '''
-        Drop table 
+        Drop table
         '''
         cur = cls.con.cursor()
         sql = "DROP TABLE {}".format(cls.table)
         cur.execute(sql)
         cur.close()
-    
->>>>>>> angus
 
 class Songs_Collections(Database, RelationInter):
 
@@ -342,23 +299,19 @@ class Songs_Collections(Database, RelationInter):
 
     def read(self, index, id):
         return super().read(index, id)
-<<<<<<< HEAD
 
-=======
-    
     def drop(self):
         return super().drop()
-        
->>>>>>> angus
+
+    def __repr__(self):
+        return "{} table ".format(self.table) + super().__repr__()
+
+
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()
 
 
-    def __repr__(self):
-        return "{} table ".format(self.table) + super().__repr__()
-    
-
-class Songs_Tags(Database, RelationInter): 
+class Songs_Tags(Database, RelationInter):
     '''
     Relations table for songs to tags.\n
     Columns are: idx, songs_id, tags_id
@@ -374,10 +327,9 @@ class Songs_Tags(Database, RelationInter):
 
     def read(self, index, id):
         return super().read(index, id)
-    
+
     def drop(self):
         return super().drop()
-
 
 class Collections_Tags(Database, RelationInter):
     '''
@@ -390,18 +342,14 @@ class Collections_Tags(Database, RelationInter):
         self.table = "collections_tags"
         self.columns = ["idx", "collections_id", "tags_id"]
 
-<<<<<<< HEAD
-
-=======
     def create(self, data):
         return super().create(data)
 
     def read(self, index, id):
         return super().read(index, id)
-    
+
     def drop(self):
         return super().drop()
-        
->>>>>>> angus
+
     def __repr__(self):
         return "{} table ".format(self.table) + super().__repr__()

@@ -72,12 +72,9 @@ class Songs(QListWidget):
 
         return loaded_to_songs
 
-<<<<<<< HEAD
-=======
 class SongsMeatball(Songs):
     pass
 
->>>>>>> angus
 class SongsPane(QWidget):
     def __init__(self):
         super().__init__()
