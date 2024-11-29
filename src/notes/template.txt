@@ -1,7 +1,8 @@
+Settings/configuration template for development purposes
 {
     "version": 1,
     "userData": {
-      "filePath": "",
+      "filePath": "/Users/angoose/UNI/uni/year_2/Projects/mpf/MPFree/tests",
       "themePreference": "dark",
       "keybinds": {
         "play": "p",
@@ -10,7 +11,9 @@
         "down": "j",
         "up": "k",
         "right": "l"
-      }    
+      }
     }
-    
-}
+  }
+
+
+

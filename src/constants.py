@@ -1,1 +1,2 @@
-JSON_PATH = "src/config.json"
+JSON_PATH = "users/config.json"
+DB_PATH = "src/mpfree.db"
